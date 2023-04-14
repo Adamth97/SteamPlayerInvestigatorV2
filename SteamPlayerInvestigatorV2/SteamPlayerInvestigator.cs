@@ -21,12 +21,13 @@ namespace SteamPlayerInvestigatorV2
                 {
                     #region Getting Information on Suspect
                     Player suspectData = new Player();
-                    apiRequest.startThread(returnURI("summary", APIKey, SteamID), "summary", suspectData);
-                    apiRequest.startThread(returnURI("friends", APIKey, SteamID), "summary", suspectData);
-                    apiRequest.startThread(returnURI("gameList", APIKey, SteamID), "summary", suspectData);
-                    apiRequest.startThread(returnURI("recentGames", APIKey, SteamID), "summary", suspectData);
+                    //apiRequest.startThread(returnURI("summary", APIKey, SteamID), "summary", suspectData);
+                    apiRequest.startThread(returnURI("friends", APIKey, SteamID), "friends", null);
+                    //apiRequest.startThread(returnURI("gameList", APIKey, SteamID), "summary", suspectData);
+                    //apiRequest.startThread(returnURI("recentGames", APIKey, SteamID), "summary", suspectData);
                     waitForActiveThreads(); //Waits for all threads to be done.
                     ResultTxtbox.Text = "---Stage 1 Completed!--- \r\nSuspected Data Retrieved.";
+                    suspect = Suspect.Instance;
                     //Check to see if the suspect is private, if so, end the analysis here.
                     #endregion
                 }//Checks validty of steamAPI Key
@@ -40,23 +41,24 @@ namespace SteamPlayerInvestigatorV2
         {
             while (true)
             {
-                foreach(Thread t in apiRequest.threads)
+                foreach (Thread t in apiRequest.threads)
                 {
-                    if(t.IsAlive) { continue; }
-                    break;
+                    if (t.IsAlive) { continue; }
                 }
+                break;
             }
         }//Waits for all threads to be done.
 
         private string returnURI(string requestType, string ApiKey, string steamID)
         {
             string uri = null;
-            switch (requestType) {
+            switch (requestType)
+            {
                 case "summary":
                     uri = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" + ApiKey + "&steamids=" + steamID;
                     break;
                 case "friends":
-
+                    uri = "https://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=" + ApiKey + "&steamid=" + steamID + "&relationship=friend";
                     break;
                 case "bans":
 

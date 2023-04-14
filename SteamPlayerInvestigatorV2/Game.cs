@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace SteamPlayerInvestigatorV2
 {
-    internal class Game
+    public class Game
     {
+        int gameID { get; set; }
+        int playTime { get; set; }
+        int lastPlayed { get; set; }
     }
 }

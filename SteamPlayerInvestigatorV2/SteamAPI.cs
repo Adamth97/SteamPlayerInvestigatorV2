@@ -38,6 +38,7 @@ namespace SteamPlayerInvestigatorV2
                 else if (request == "gamelist") { handleGameList(result, player); }
                 else { handleRecentGameList(result, player); } //RecentGames Request
             });
+            thread.Name = "test";
             threads.Add(thread);
             thread.Start();
         }
@@ -84,7 +85,14 @@ namespace SteamPlayerInvestigatorV2
 
         private void handleSummary(string summary, Player findThisPlayer)
         {
-            throw new NotImplementedException();
+            #region Seperating Info from APIResponse
+            summary = summary.Remove(0, 25);
+            summary = summary.Remove((summary.Length - 4), 4);
+            summary = summary.Replace("\"", "");
+            #endregion
+
+            string[] splitResponse = summary.Split(',');
+
         }
 
         public string returnApiReply(string uri)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SteamPlayerInvestigatorV2
 {
-    class Player
+    public class Player
     {
         #region Account Info get; set;
         public string steamID { get; set; }
@@ -32,5 +32,6 @@ namespace SteamPlayerInvestigatorV2
         public List<Game> gameList { get; set; }
         public List<Game> recentlyPlayed { get; set; }
         #endregion
+
     }
 }

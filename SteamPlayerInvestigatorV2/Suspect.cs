@@ -10,7 +10,7 @@ namespace SteamPlayerInvestigatorV2
     {
         private static Suspect instance = null;
         private static readonly object padlock = new object();
-        Suspect() { }
+        Suspect() { suspectList = new List<Player>(); steamIDList = new List<string>(); }
         public static Suspect Instance
         {
             get { 
@@ -27,5 +27,6 @@ namespace SteamPlayerInvestigatorV2
         public List<Player> suspectList {  get; set; }
         public List<string> steamIDList { get; set; }
         public Player playerData { get; set; }
+
     }
 }
