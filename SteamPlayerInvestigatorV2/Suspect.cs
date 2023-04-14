@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace SteamPlayerInvestigatorV2
 {
-    internal class Suspect
+    public class Suspect
     {
+        public List<Player> suspectList {  get; set; }
+        public List<string> steamIDList { get; set; }
+        public Player playerData { get; set; }
     }
 }

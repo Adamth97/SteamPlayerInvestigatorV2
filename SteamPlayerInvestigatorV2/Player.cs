@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SteamPlayerInvestigatorV2
 {
-    internal class Player
+    public class Player
     {
     }
 }
