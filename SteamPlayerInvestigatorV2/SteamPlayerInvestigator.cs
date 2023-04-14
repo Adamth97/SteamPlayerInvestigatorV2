@@ -6,6 +6,7 @@ namespace SteamPlayerInvestigatorV2
         public Suspect suspect { get; set; }
         public SteamPlayerInvestigator()
         {
+            suspect = Suspect.Instance;
             InitializeComponent();
         }
 
@@ -18,15 +19,34 @@ namespace SteamPlayerInvestigatorV2
                 apiRequest = SteamAPI.Instance;
                 if (apiRequest.forbiddenCheck(APIKey, SteamID) == false)
                 {
+                    #region Getting Information on Suspect
                     Player suspectData = new Player();
                     apiRequest.startThread(returnURI("summary", APIKey, SteamID), "summary", suspectData);
-                    //on suspect - player summary, friends, games, recent games
-                }
+                    apiRequest.startThread(returnURI("friends", APIKey, SteamID), "summary", suspectData);
+                    apiRequest.startThread(returnURI("gameList", APIKey, SteamID), "summary", suspectData);
+                    apiRequest.startThread(returnURI("recentGames", APIKey, SteamID), "summary", suspectData);
+                    waitForActiveThreads(); //Waits for all threads to be done.
+                    ResultTxtbox.Text = "---Stage 1 Completed!--- \r\nSuspected Data Retrieved.";
+                    //Check to see if the suspect is private, if so, end the analysis here.
+                    #endregion
+                }//Checks validty of steamAPI Key
                 else { ResultTxtbox.Text = "---Forbidden!--- \r\nPlease ensure that the APIKey is correct.\r\nThe APIKey you have entered is invalid!"; }
 
             }//Information Entered
             else { ResultTxtbox.Text = "---Analysis Failure!--- \r\nPlease ensure that the APIKey and SteamID are entered.\r\nIf they are already entered, ensure they are correct."; }
         }
+
+        private void waitForActiveThreads()
+        {
+            while (true)
+            {
+                foreach(Thread t in apiRequest.threads)
+                {
+                    if(t.IsAlive) { continue; }
+                    break;
+                }
+            }
+        }//Waits for all threads to be done.
 
         private string returnURI(string requestType, string ApiKey, string steamID)
         {

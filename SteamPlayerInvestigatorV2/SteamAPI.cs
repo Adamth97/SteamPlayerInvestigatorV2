@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace SteamPlayerInvestigatorV2
 {
-    public sealed class SteamAPI : SteamPlayerInvestigator
+    public sealed class SteamAPI
     {
         private static SteamAPI instance;
         private static readonly object padlock = new object();
-        private List<Thread> threads = new List<Thread>();
+        public List<Thread> threads = new List<Thread>();
 
         SteamAPI() { }
         public static SteamAPI Instance {
@@ -42,17 +42,17 @@ namespace SteamPlayerInvestigatorV2
             thread.Start();
         }
 
-        private void handleRecentGameList(string result, Player player)
+        private void handleRecentGameList(string result, Player findThisPlayer)
         {
             throw new NotImplementedException();
         }
 
-        private void handleGameList(string result, Player player)
+        private void handleGameList(string result, Player findThisPlayer)
         {
             throw new NotImplementedException();
         }
 
-        private void handleLevel(string result, Player player)
+        private void handleLevel(string result, Player findThisPlayer)
         {
             throw new NotImplementedException();
         }
@@ -64,8 +64,23 @@ namespace SteamPlayerInvestigatorV2
 
         private void handleFriends(string result, Player findThisPlayer)
         {
-            throw new NotImplementedException();
-        }
+            #region Seperating Info from APIResponse
+            result = result.Remove(0, 28);
+            result = result.Remove((result.Length - 4), 4);
+            result = result.Replace("\"", "");
+            result = result.Replace(",{", "");
+            #endregion
+            Suspect suspect = Suspect.Instance;
+            string[] splitResponse = result.Split('}');
+            for (int i = 0; i < splitResponse.Length; i++)
+            {
+                string[] tempArray = splitResponse[i].Split(',', 2);
+                tempArray = tempArray[0].Split(':');
+                if (!suspect.steamIDList.Contains(tempArray[1]) && tempArray[1] != suspect.playerData.steamID) { suspect.steamIDList.Add(tempArray[1]); } 
+                //If steamID is not in the current steamIDList and is not equal to the suspect themself.
+            }
+
+        }//Player doesnt matter in this one, as we aren't adding data to the player class but the suspect class instead.
 
         private void handleSummary(string summary, Player findThisPlayer)
         {
@@ -74,9 +89,15 @@ namespace SteamPlayerInvestigatorV2
 
         public string returnApiReply(string uri)
         {
-            return string.Empty;
-        }
-
+            HttpClient client;
+            HttpClientHandler handler = new HttpClientHandler() { AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate };
+            client = new HttpClient(handler);
+            string reply = null;
+            client.BaseAddress = new Uri(uri);
+            HttpResponseMessage response = client.GetAsync(client.BaseAddress).Result;
+            reply = response.Content.ReadAsStringAsync().Result;
+            return reply;
+        }//Returns the reply of the result.
         internal bool forbiddenCheck(string APIKey, string steamID)
         {
             HttpClient client;
