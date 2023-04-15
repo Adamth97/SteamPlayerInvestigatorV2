@@ -61,7 +61,7 @@
             label2.Name = "label2";
             label2.Size = new Size(228, 45);
             label2.TabIndex = 1;
-            label2.Text = "      Please enter your Steam APIKey \r\n   aswell as the SteamID of the account\r\n you wish to analyse in the boxes below.";
+            label2.Text = "      Please enter your Steam APIKey \r\n aswell as the SteamID64 of the account\r\n you wish to analyse in the boxes below.";
             // 
             // label3
             // 
@@ -100,11 +100,11 @@
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Cambria", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
-            label5.Location = new Point(538, 246);
+            label5.Location = new Point(527, 245);
             label5.Name = "label5";
-            label5.Size = new Size(53, 15);
+            label5.Size = new Size(67, 15);
             label5.TabIndex = 5;
-            label5.Text = "SteamID";
+            label5.Text = "SteamID64";
             // 
             // ApiKeyTxtbox
             // 
@@ -115,6 +115,7 @@
             ApiKeyTxtbox.PlaceholderText = "Please enter the ApiKey here.";
             ApiKeyTxtbox.Size = new Size(191, 23);
             ApiKeyTxtbox.TabIndex = 6;
+            ApiKeyTxtbox.Text = "30FD39066A9E2628D7CDE47C35CAE10A";
             // 
             // SteamIDTxtbox
             // 
@@ -124,6 +125,7 @@
             SteamIDTxtbox.PlaceholderText = "Please enter the SteamID here.";
             SteamIDTxtbox.Size = new Size(191, 23);
             SteamIDTxtbox.TabIndex = 7;
+            SteamIDTxtbox.Text = "76561198440969812";
             // 
             // AnalyseBtn
             // 
@@ -151,9 +153,9 @@
             // progressBar1
             // 
             progressBar1.BackColor = Color.White;
-            progressBar1.Location = new Point(555, 338);
+            progressBar1.Location = new Point(556, 338);
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(211, 34);
+            progressBar1.Size = new Size(209, 34);
             progressBar1.TabIndex = 10;
             // 
             // SteamPlayerInvestigator
