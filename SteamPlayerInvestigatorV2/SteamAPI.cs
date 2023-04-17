@@ -58,7 +58,8 @@ namespace SteamPlayerInvestigatorV2
             
             return suspectData;
         }//Does all queries on suspect and assigns the data
-        public Task getFriendsofFriends(List<string> steamList) {
+
+        public void getFriendsofFriends(List<string> steamList) {
             int suspectFriendCount = steamList.Count;
             for (int i = 0; i < suspectFriendCount; i++)
             {
@@ -71,37 +72,62 @@ namespace SteamPlayerInvestigatorV2
                 threads.Add(thread); thread.Start();
             }
             waitForAllThreads();
-            return Task.CompletedTask;
         }//Does all friends queries, gets friends of friends of the suspect and adds them to the steamIDList
-        public Task gatherSuspects()
+
+        public void gatherSuspects() {
+            string steamIDs = "";
+            for(int i = 0; i < Suspect.Instance.steamIDList.Count; i++) {
+                if (threads.Count == 50) { waitForAllThreads(); } //Frees up threads
+                if(i % 100 == 0 && i != 0) { startBanThreads(steamIDs.Substring(0, steamIDs.Length - 1)); steamIDs = ""; }//If its been 100 people.
+                steamIDs += Suspect.Instance.steamIDList[i] + ",";
+            }
+            startBanThreads(steamIDs);
+            waitForAllThreads();
+        }
+        public void startBanThreads(string steamIDs)
         {
-            for (int i = 0; i < Suspect.Instance.steamIDList.Count; i++)
-            {
-                string steamID = Suspect.Instance.steamIDList[i];
+            Thread thread = new Thread(() =>
+                {
+                    handleBans(returnApiReply(updateURI("bans", steamIDs)), steamIDs);
+                });
+            thread.Name = "test";
+            threads.Add(thread); thread.Start();
+        }//Starts the banThread to sendRequest and handle response.
+
+        //public void gatherSuspects()
+        //{
+        //    for (int i = 0; i < Suspect.Instance.steamIDList.Count; i++)
+        //    {
+        //        string steamID = Suspect.Instance.steamIDList[i];
+        //        if (threads.Count == 50) { waitForAllThreads(); }
+        //        Thread thread = new Thread(() =>
+        //        {
+        //            handleBans(returnApiReply(updateURI("bans", steamID)), steamID);
+        //        });
+        //        threads.Add(thread); thread.Start();
+        //    }
+        //    waitForAllThreads();
+        //}//Does a ban query on every steamID in the SteamID list, if they have a ban, all information is stored and they are added to the suspect list.
+        public void bannedPlayersThreads(string threadType) {
+            foreach(Player bannedFriend in Suspect.Instance.suspectList) {
+
                 if (threads.Count == 50) { waitForAllThreads(); }
                 Thread thread = new Thread(() =>
                 {
-                    handleBans(returnApiReply(updateURI("bans", steamID)), steamID);
+                    if (threadType == "level") { handleLevel(returnApiReply(updateURI("level", bannedFriend.steamID)), bannedFriend); }
+                    else if (threadType == "summary") { handleSummary(returnApiReply(updateURI("summary", bannedFriend.steamID)), bannedFriend); }
+                    else if (threadType == "gameList") { handleGameList(returnApiReply(updateURI("gameList", bannedFriend.steamID)), bannedFriend); }
+                    else if (threadType == "recentGames") { handleRecentGameList(returnApiReply(updateURI("recentGames", bannedFriend.steamID)), bannedFriend); }
+                    else if (threadType == "UNIX") { }
+                    else if (threadType == "Analysis") { }
                 });
-                //thread.Name = "suspects";
                 threads.Add(thread); thread.Start();
             }
             waitForAllThreads();
-            return Task.CompletedTask;
-        }//Does a ban query on every steamID in the SteamID list, if they have a ban, all information is stored and they are added to the suspect list.
-
-        private void waitForFreeThread()
-        {
-            while (true)
-            {
-                foreach (Thread t in threads)
-                {
-                    if (t.ThreadState != ThreadState.Stopped) { continue; }
-                    else { threads.Remove(t); break; }
-                }
-                break;
-            }
-        }
+        }//Deals with all threads using the suspectList - Summaries, level, game, recentgame requests. (UNIX Timestamp creations aswell as playerAnalysis) - may move to a different class
+        public void gatherBPGameList() { }
+        public void gatherBPRecentGames() { }
+        public void gatherBPLevel() { }
         private void waitForAllThreads()
         {
             while (threads.Count != 0)
@@ -190,51 +216,103 @@ namespace SteamPlayerInvestigatorV2
             }
             return tempPlayer;
         }//Removes playerLevel from result and assigns it to the player.
-        private void handleBans(string result, string steamID)
-        {
-            Player tempPlayer = new Player();
-            if(result != "{}" && result.Contains("VACBanned\":true")) {
+
+        private void handleBans(string result,string steamIDs) {
+            if (result.Contains("429 Too Many Requests"))
+                    {
+                        Thread.Sleep(3000);
+                        handleBans(returnApiReply(updateURI("bans", steamIDs)), steamIDs);
+                    }//If too many requests, waits a second and then redoes the request.
+            else if (result != "{}") {
 
                 #region Seperating Info from APIResponse
-                result = result.Remove(0, 25);
+                result = result.Remove(0, 13);
                 result = result.Remove((result.Length - 4), 4);
                 result = result.Replace("\"", "");
                 #endregion
-                string[] splitResponse = result.Split(',');
-                tempPlayer.steamID = splitResponse[0];
-                #region Extract Information
-                for (int i = 0; i < splitResponse.Length; i++)
+
+                List<string> splitResponse = result.Split("},{").ToList(); //Seperates them into Players.
+
+                for (int i = 0; i < splitResponse.Count; i++) { 
+                    if (splitResponse[i].Contains("VACBanned:false")) { 
+                        splitResponse.RemoveAt(i); i--; } } //Removes all players that arent banned out of the 100 players. (100 max, may not be 100) }
+                
+                //foreach (string bannedPlayer in splitResponse)
+                for (int i = 0; i < splitResponse.Count; i++)
                 {
-                    string[] tempArray = splitResponse[i].Split(':', 2);
-                    switch (tempArray[0])
-                    {
-                        case "VACBanned":
-                            tempPlayer.vacBanned = bool.Parse(tempArray[1]);
-                            break;
-                        case "numberOfVACBans":
-                            tempPlayer.numberOfVACBans = int.Parse(tempArray[1]);
-                            break;
-                        case "DaysSinceLastBan":
-                            tempPlayer.daysSinceLastBan = int.Parse(tempArray[1]);
-                            break;
+                    Player bannedPlayerData = new Player();
+
+                    string[] bannedPlayerInfo = splitResponse[i].Split(',');
+                    string[] tempArray = splitResponse[i].Split(','); tempArray = splitResponse[0].Split(':', 2);
+
+                    for (int j = 0; j < tempArray.Length; j++) {
+                        
+                        switch (tempArray[0])
+                        {
+                            case "SteamId":
+                                bannedPlayerData.steamID = tempArray[1];
+                                break;
+                            case "VACBanned":
+                                bannedPlayerData.vacBanned = bool.Parse(tempArray[1]);
+                                break;
+                            case "numberOfVACBans":
+                                bannedPlayerData.numberOfVACBans = int.Parse(tempArray[1]);
+                                break;
+                            case "DaysSinceLastBan":
+                                bannedPlayerData.daysSinceLastBan = int.Parse(tempArray[1]);
+                                break;
+                        }
                     }
+                    Suspect.Instance.suspectList.Add(bannedPlayerData);
                 }
-                Suspect.Instance.suspectList.Add(tempPlayer);  //If they player has a VAC ban, they are added to the suspect list.
-                #endregion
-            } //Public account
-            else if (result.Contains("429 Too Many Requests"))
-            {
-                Thread.Sleep(10000);
-                handleBans(returnApiReply(updateURI("bans", steamID)), steamID);
-            }//If too many requests, waits a second and then redoes the request.
+            }
         }
+
+        //private void handleBans(string result, string steamID)
+        //{
+        //    Player tempPlayer = new Player();
+        //    if(result != "{}" && result.Contains("VACBanned\":true")) {
+
+        //        #region Seperating Info from APIResponse
+        //        result = result.Remove(0, 25);
+        //        result = result.Remove((result.Length - 4), 4);
+        //        result = result.Replace("\"", "");
+        //        #endregion
+        //        string[] splitResponse = result.Split(',');
+        //        tempPlayer.steamID = splitResponse[0];
+        //        #region Extract Information
+        //        for (int i = 0; i < splitResponse.Length; i++)
+        //        {
+        //            string[] tempArray = splitResponse[i].Split(':', 2);
+        //            switch (tempArray[0])
+        //            {
+        //                case "VACBanned":
+        //                    tempPlayer.vacBanned = bool.Parse(tempArray[1]);
+        //                    break;
+        //                case "numberOfVACBans":
+        //                    tempPlayer.numberOfVACBans = int.Parse(tempArray[1]);
+        //                    break;
+        //                case "DaysSinceLastBan":
+        //                    tempPlayer.daysSinceLastBan = int.Parse(tempArray[1]);
+        //                    break;
+        //            }
+        //        }
+        //        Suspect.Instance.suspectList.Add(tempPlayer);  //If they player has a VAC ban, they are added to the suspect list.
+        //        #endregion
+        //    } //Public account
+        //    else if (result.Contains("429 Too Many Requests"))
+        //    {
+        //        Thread.Sleep(3000);
+        //        handleBans(returnApiReply(updateURI("bans", steamID)), steamID);
+        //    }//If too many requests, waits a second and then redoes the request.
+        //}
         private void handleFriends(string result, string steamID)
         {
             if (result == "{}" || result.Contains("Access Denied")) { return; } //If profile is private and friendsList cannot be accessed.
 
             if (result.Contains("429 Too Many Requests"))
             {
-                Thread.Sleep(10000);
+                Thread.Sleep(3000);
                 handleFriends(returnApiReply(updateURI("bans", steamID)), steamID);
             }//If too many requests, waits a second and then redoes the request.
             else
