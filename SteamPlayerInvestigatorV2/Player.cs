@@ -8,6 +8,8 @@ namespace SteamPlayerInvestigatorV2
 {
     public class Player
     {
+        public Player() { gameList = new List<Game>(); recentlyPlayed = new List<Game>(); } 
+
         #region Account Info get; set;
         public string steamID { get; set; }
         public string personaName { get; set; }
@@ -21,8 +23,6 @@ namespace SteamPlayerInvestigatorV2
         #endregion
         #region VacBan Info get; set;
         public bool vacBanned { get; set; }
-        public bool communityBanned { get; set; }
-        public bool economyBan { get; set; }
         public int numberOfVACBans { get; set; }
         public int daysSinceLastBan { get; set; }
         public int unixTimestampOfRecentBan { get; set; }
@@ -32,6 +32,9 @@ namespace SteamPlayerInvestigatorV2
         public List<Game> gameList { get; set; }
         public List<Game> recentlyPlayed { get; set; }
         #endregion
-
+        #region Misc get; set;
+        public string locCountryCode { get; set; }
+        public string locStateCode { get; set; }
+        #endregion
     }
 }

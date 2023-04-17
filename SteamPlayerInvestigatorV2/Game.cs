@@ -8,8 +8,9 @@ namespace SteamPlayerInvestigatorV2
 {
     public class Game
     {
-        int gameID { get; set; }
-        int playTime { get; set; }
-        int lastPlayed { get; set; }
+        public int gameID { get; set; }
+        public int playTime { get; set; }
+        public int lastPlayed { get; set; }
+        public int playtimeForever { get; set; }
     }
 }

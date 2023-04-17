@@ -83,6 +83,7 @@
             ResultTxtbox.Multiline = true;
             ResultTxtbox.Name = "ResultTxtbox";
             ResultTxtbox.ReadOnly = true;
+            ResultTxtbox.ScrollBars = ScrollBars.Vertical;
             ResultTxtbox.Size = new Size(515, 403);
             ResultTxtbox.TabIndex = 3;
             // 
@@ -154,6 +155,7 @@
             // 
             progressBar1.BackColor = Color.White;
             progressBar1.Location = new Point(556, 338);
+            progressBar1.MarqueeAnimationSpeed = 5;
             progressBar1.Name = "progressBar1";
             progressBar1.Size = new Size(209, 34);
             progressBar1.TabIndex = 10;
@@ -193,6 +195,6 @@
         private TextBox SteamIDTxtbox;
         private Button AnalyseBtn;
         private Button Savebtn;
-        private ProgressBar progressBar1;
+        public ProgressBar progressBar1;
     }
 }
