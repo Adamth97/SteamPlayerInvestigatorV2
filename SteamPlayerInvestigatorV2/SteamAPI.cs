@@ -97,7 +97,20 @@ namespace SteamPlayerInvestigatorV2
             }
             waitForAllThreads();
         }
-        public void gatherBPLevel() { }
+        public void gatherBPLevel() {
+            foreach (Player player in Suspect.Instance.suspectList)
+            {
+                if (player.communityVisibilityState == 3)
+                {
+                    Thread thread = new Thread(() =>
+                    {
+                        handleLevel(returnApiReply(updateURI("level", player.steamID)), player.steamID);
+                    });
+                    threads.Add(thread); thread.Start(); 
+                }
+            }
+            waitForAllThreads();
+        }
         private void waitForAllThreads()
         {
             while (threads.Count != 0)
@@ -224,11 +237,17 @@ namespace SteamPlayerInvestigatorV2
         }
         private void handleLevel(string result, string steamID)
         {
-            if (result != "{\"response\":{}}" && !result.Contains("Access Denied"))
+            if (result.Contains("429 Too Many Requests"))
+            {
+                Thread.Sleep(3000);
+                handleLevel(returnApiReply(updateURI("level", steamID)), steamID);
+            }//If too many requests, waits a second and then redoes the request.
+            else if (result != "{\"response\":{}}" && !result.Contains("Access Denied"))
             {
                 string reply = result.Substring(14, result.Length - 16);
                 string[] splitReply = reply.Split(':');
-                //tempPlayer.steamLevel = int.Parse(splitReply[1]);
+                if(steamID == suspectID) { Suspect.Instance.playerData.steamLevel = int.Parse(splitReply[1]); }
+                else { Suspect.Instance.suspectList.Find(i => i.steamID == steamID).steamLevel = int.Parse(splitReply[1]); ; }
             }
         }//Removes playerLevel from result and assigns it to the player.
         private void handleBans(string result,string steamIDs) {

@@ -64,7 +64,7 @@ namespace SteamPlayerInvestigatorV2
 
                     #region Getting Banned Players steamLevel
                     ResultTxtbox.Text += "\r\nGathering BannedPlayers steamLevels...\r\n"; updateProgressBar();
-                    //await apiRequest.gatherSuspects();
+                    apiRequest.gatherBPLevel();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
