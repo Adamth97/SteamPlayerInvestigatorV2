@@ -18,7 +18,7 @@ namespace SteamPlayerInvestigatorV2
             handleSummary(returnApiReply(updateURI("summary", suspectID)), suspectID); //Gets suspects Summary Data 
             //handleLevel(returnApiReply(updateURI("level", suspectID)), suspectID);//Gets suspects level
             handleGameList(returnApiReply(updateURI("gameList", suspectID)), suspectID);//Gets suspects gameList
-            //handleRecentGameList(returnApiReply(updateURI("recentGames", suspectID)), suspectID); // Gets suspects RecentGames
+            handleRecentGameList(returnApiReply(updateURI("recentGames", suspectID)), suspectID); // Gets suspects RecentGames
             handleFriends(returnApiReply(updateURI("friends", suspectID)), suspectID); //Gets users friends.
         }//Does all queries on suspect and assigns the data
         public void getFriendsofFriends(List<string> steamList) {
@@ -78,12 +78,25 @@ namespace SteamPlayerInvestigatorV2
                     {
                         handleGameList(returnApiReply(updateURI("gameList", player.steamID)), player.steamID);
                     });
+                    threads.Add(thread); thread.Name = "test"; thread.Start(); //Thread.Sleep(999999999);
+                }
+            }
+            waitForAllThreads();
+        }
+        public void gatherBPRecentGames() {
+            foreach (Player player in Suspect.Instance.suspectList)
+            {
+                if (player.communityVisibilityState == 3)
+                {
+                    Thread thread = new Thread(() =>
+                    {
+                        handleRecentGameList(returnApiReply(updateURI("recentGames", player.steamID)), player.steamID);
+                    });
                     threads.Add(thread); thread.Start();
                 }
             }
             waitForAllThreads();
         }
-        public void gatherBPRecentGames() { }
         public void gatherBPLevel() { }
         private void waitForAllThreads()
         {
@@ -121,9 +134,48 @@ namespace SteamPlayerInvestigatorV2
             }
             return uri;
         }
-        private Player handleRecentGameList(string result, Player tempPlayer)
+        private void handleRecentGameList(string result, string steamID)
         {
-            throw new NotImplementedException();
+            if (result.Contains("429 Too Many Requests"))
+            {
+                Thread.Sleep(3000);
+                handleRecentGameList(returnApiReply(updateURI("recentGames", steamID)), steamID);
+            }//If too many requests, waits a second and then redoes the request.
+            else if (result != "{\"response\":{}}" && !result.Contains("total_count\":0")){
+                #region Seperating Data from JSON
+                result = result.Substring(38, result.Length - 44);
+                result = result.Replace("\"", "").Replace("{", "");
+                string[] gameList = result.Split("},");
+                #endregion
+
+                #region Assigning data to player class from JSON 
+                foreach (string game in gameList)
+                {
+                    string[] gameData = game.Split(','); //Splits game from gameList into sections
+                    Game newGame = new Game();
+                    for (int i = 0; i < gameData.Length; i++)
+                    {
+                        string[] tempArray = gameData[i].Split(':', 2);
+                        switch (tempArray[0])
+                        {
+                            case "appid":
+                                newGame.gameID = (int.Parse(tempArray[1]));
+                                break;
+                            case "playtime_forever":
+                                newGame.playTime = (int.Parse(tempArray[1]));
+                                break;
+                            case "rtime_last_played":
+                                try { newGame.lastPlayed = (int.Parse(tempArray[1])); } catch { }
+
+                                break;
+                        }
+                    }//Assigns data to relevant variables in game class.
+
+                    if (steamID == suspectID) { Suspect.Instance.playerData.recentlyPlayed.Add(newGame); } //Adds to suspect
+                    else { Suspect.Instance.suspectList.Find(i => i.steamID == steamID).recentlyPlayed.Add(newGame); } //Adds to bannedPlayer
+                }
+                #endregion
+            }
         }
         private void handleGameList(string result, string steamID)
         {
@@ -136,12 +188,12 @@ namespace SteamPlayerInvestigatorV2
             else if (result != "{\"response\":{}}")
             {
                 #region Seperating Data from JSON
-                result = result.Substring(38, result.Length - 44);
+                result = result.Substring(39, result.Length - 43);
                 result = result.Replace("\"", "").Replace("{", "");
                 string[] gameList = result.Split("},");
                 #endregion
 
-                #region Assigning data to player class from JSON 
+                #region Assigning data
                 foreach (string game in gameList)
                 {
                     string[] gameData = game.Split(','); //Splits game from gameList into sections
@@ -170,15 +222,14 @@ namespace SteamPlayerInvestigatorV2
                 #endregion
             }
         }
-        private Player handleLevel(string result, Player tempPlayer)
+        private void handleLevel(string result, string steamID)
         {
             if (result != "{\"response\":{}}" && !result.Contains("Access Denied"))
             {
                 string reply = result.Substring(14, result.Length - 16);
                 string[] splitReply = reply.Split(':');
-                tempPlayer.steamLevel = int.Parse(splitReply[1]);
+                //tempPlayer.steamLevel = int.Parse(splitReply[1]);
             }
-            return tempPlayer;
         }//Removes playerLevel from result and assigns it to the player.
         private void handleBans(string result,string steamIDs) {
             if (result.Contains("429 Too Many Requests"))
