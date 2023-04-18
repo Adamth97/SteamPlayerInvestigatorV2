@@ -8,12 +8,11 @@ namespace SteamPlayerInvestigatorV2
 {
     public class Player
     {
-        public Player() { gameList = new List<Game>(); recentlyPlayed = new List<Game>(); } 
+        public Player() {} 
 
         #region Account Info get; set;
         public string steamID { get; set; }
         public string personaName { get; set; }
-        public string profileURLIdentifier { get; set; }
         public string avatar { get; set; }
         public string realName { get; set; }
         public string primaryClanID { get; set; }

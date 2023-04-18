@@ -20,8 +20,7 @@ namespace SteamPlayerInvestigatorV2
 
                     #region Getting Information on Suspect and assigning it to playerData
                     ResultTxtbox.Text = "Gathering Suspect Data...\r\n"; updateProgressBar();
-                    Player suspectData = apiRequest.returnSuspectData();
-                    Suspect.Instance.playerData = suspectData;
+                    apiRequest.assignToSuspectData();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
@@ -47,7 +46,7 @@ namespace SteamPlayerInvestigatorV2
 
                     #region Getting Banned Players summaries
                     ResultTxtbox.Text += "Gathering BannedPlayers Summaries...\r\n"; updateProgressBar();
-                    //await apiRequest.gatherSuspects();
+                    apiRequest.gatherSummaries();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
