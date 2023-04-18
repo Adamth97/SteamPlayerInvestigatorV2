@@ -70,7 +70,7 @@ namespace SteamPlayerInvestigatorV2
 
                     #region Iterating BannedPlayers and assigning UNIX Timestamp for most recent ban.
                     ResultTxtbox.Text += "\r\nCaluclating difference between Ban time and Suspect creation time...\r\n"; updateProgressBar();
-                    //calculateTimestamps();
+                    calculateTimestamps();
                     ResultTxtbox.Text += "Caluclated.\r\n";
                     #endregion
 
@@ -92,5 +92,13 @@ namespace SteamPlayerInvestigatorV2
         }
 
         public void updateProgressBar() { progressBar1.Value += 10; progressBar1.Refresh(); Application.DoEvents(); } //Used to increment the progress bar.
+        public void calculateTimestamps() { 
+            foreach(Player player in Suspect.Instance.suspectList)
+            {
+                int secondsSinceBan = player.daysSinceLastBan * 86400;
+                player.unixTimestampOfRecentBan = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds - secondsSinceBan;
+            }
+        }
+        public void evaluateBannedPlayers() { }
     }
 }

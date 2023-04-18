@@ -16,7 +16,7 @@ namespace SteamPlayerInvestigatorV2
         public SteamAPI(string APIKey, string SteamID) { ApiKey = APIKey; suspectID = SteamID; }
         public void assignToSuspectData() { 
             handleSummary(returnApiReply(updateURI("summary", suspectID)), suspectID); //Gets suspects Summary Data 
-            //handleLevel(returnApiReply(updateURI("level", suspectID)), suspectID);//Gets suspects level
+            handleLevel(returnApiReply(updateURI("level", suspectID)), suspectID);//Gets suspects level
             handleGameList(returnApiReply(updateURI("gameList", suspectID)), suspectID);//Gets suspects gameList
             handleRecentGameList(returnApiReply(updateURI("recentGames", suspectID)), suspectID); // Gets suspects RecentGames
             handleFriends(returnApiReply(updateURI("friends", suspectID)), suspectID); //Gets users friends.
