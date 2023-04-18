@@ -25,7 +25,7 @@ namespace SteamPlayerInvestigatorV2
                     #endregion
 
                     #region Get friends of friends using Threads, add it to suspects steamIDlist.
-                    ResultTxtbox.Text += "Gathering Friends of Friends...\r\n"; updateProgressBar();
+                    ResultTxtbox.Text += "\r\nGathering Friends of Friends...\r\n"; updateProgressBar();
                     apiRequest.getFriendsofFriends(Suspect.Instance.steamIDList);
                     Suspect.Instance.steamIDList = Suspect.Instance.steamIDList.Distinct().ToList();
                     ResultTxtbox.Text += "Gathered.\r\n";
@@ -45,42 +45,43 @@ namespace SteamPlayerInvestigatorV2
                     #endregion
 
                     #region Getting Banned Players summaries
-                    ResultTxtbox.Text += "Gathering BannedPlayers Summaries...\r\n"; updateProgressBar();
+                    ResultTxtbox.Text += "\r\nGathering BannedPlayers Summaries...\r\n"; updateProgressBar();
                     apiRequest.gatherSummaries();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
                     #region Getting Banned Players gameList
-                    ResultTxtbox.Text += "Gathering BannedPlayers GameList...\r\n"; updateProgressBar();
-                    //await apiRequest.gatherSuspects();
+                    ResultTxtbox.Text += "\r\nGathering BannedPlayers GameList...\r\n"; updateProgressBar();
+                    apiRequest.gatherBPGameList();  
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
                     #region Getting Banned Players RecentGames
-                    ResultTxtbox.Text += "Gathering BannedPlayers RecentGames...\r\n"; updateProgressBar();
+                    ResultTxtbox.Text += "\r\nGathering BannedPlayers RecentGames...\r\n"; updateProgressBar();
                     //await apiRequest.gatherSuspects();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
                     #region Getting Banned Players steamLevel
-                    ResultTxtbox.Text += "Gathering BannedPlayers steamLevels...\r\n"; updateProgressBar();
+                    ResultTxtbox.Text += "\r\nGathering BannedPlayers steamLevels...\r\n"; updateProgressBar();
                     //await apiRequest.gatherSuspects();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
                     #region Iterating BannedPlayers and assigning UNIX Timestamp for most recent ban.
-                    ResultTxtbox.Text += "Caluclating difference between Ban time and Suspect creation time...\r\n"; updateProgressBar();
+                    ResultTxtbox.Text += "\r\nCaluclating difference between Ban time and Suspect creation time...\r\n"; updateProgressBar();
                     //calculateTimestamps();
                     ResultTxtbox.Text += "Caluclated.\r\n";
                     #endregion
 
                     #region Assigning BannedPlayers a Suspect Rating
-                    ResultTxtbox.Text += "Evaluating all banned players, assigning suspect ratings...\r\n"; updateProgressBar();
+                    ResultTxtbox.Text += "\r\nEvaluating all banned players, assigning suspect ratings...\r\n"; updateProgressBar();
                     //evaluateBannedPlayers();
                     ResultTxtbox.Text += "Completed.\r\n";
                     #endregion
 
                     #region Display Results
+                    updateProgressBar();
                     #endregion
 
                 }//Checks validty of steamAPI Key

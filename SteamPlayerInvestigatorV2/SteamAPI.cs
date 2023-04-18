@@ -17,7 +17,7 @@ namespace SteamPlayerInvestigatorV2
         public void assignToSuspectData() { 
             handleSummary(returnApiReply(updateURI("summary", suspectID)), suspectID); //Gets suspects Summary Data 
             //handleLevel(returnApiReply(updateURI("level", suspectID)), suspectID);//Gets suspects level
-            //handleGameList(returnApiReply(updateURI("gameList", suspectID)), suspectID);//Gets suspects gameList
+            handleGameList(returnApiReply(updateURI("gameList", suspectID)), suspectID);//Gets suspects gameList
             //handleRecentGameList(returnApiReply(updateURI("recentGames", suspectID)), suspectID); // Gets suspects RecentGames
             handleFriends(returnApiReply(updateURI("friends", suspectID)), suspectID); //Gets users friends.
         }//Does all queries on suspect and assigns the data
@@ -44,24 +44,6 @@ namespace SteamPlayerInvestigatorV2
                 });
             threads.Add(thread); thread.Start();
         }//Starts the banThread to sendRequest and handle response.
-
-        //public void bannedPlayersThreads(string threadType) {
-        //    foreach(Player bannedFriend in Suspect.Instance.suspectList) {
-
-        //        if (threads.Count == 50) { waitForAllThreads(); }
-        //        Thread thread = new Thread(() =>
-        //        {
-        //            if (threadType == "level") { handleLevel(returnApiReply(updateURI("level", bannedFriend.steamID)), bannedFriend); }
-        //            else if (threadType == "summary") { handleSummary(returnApiReply(updateURI("summary", bannedFriend.steamID)), bannedFriend); }
-        //            else if (threadType == "gameList") { handleGameList(returnApiReply(updateURI("gameList", bannedFriend.steamID)), bannedFriend); }
-        //            else if (threadType == "recentGames") { handleRecentGameList(returnApiReply(updateURI("recentGames", bannedFriend.steamID)), bannedFriend); }
-        //            else if (threadType == "UNIX") { }
-        //            else if (threadType == "Analysis") { }
-        //        });
-        //        threads.Add(thread); thread.Start();
-        //    }
-        //    waitForAllThreads();
-        //}//Deals with all threads using the suspectList - Summaries, level, game, recentgame requests. (UNIX Timestamp creations aswell as playerAnalysis) - may move to a different class
         public void gatherSuspects()
         {
             string steamIDs = "";
@@ -89,7 +71,18 @@ namespace SteamPlayerInvestigatorV2
             startSpecificThreads(steamIDs, "Summaries");
             waitForAllThreads();
         }
-        public void gatherBPGameList() { }
+        public void gatherBPGameList() {
+            foreach (Player player in Suspect.Instance.suspectList) { 
+                if(player.communityVisibilityState == 3) {
+                    Thread thread = new Thread(() =>
+                    {
+                        handleGameList(returnApiReply(updateURI("gameList", player.steamID)), player.steamID);
+                    });
+                    threads.Add(thread); thread.Start();
+                }
+            }
+            waitForAllThreads();
+        }
         public void gatherBPRecentGames() { }
         public void gatherBPLevel() { }
         private void waitForAllThreads()
@@ -132,9 +125,15 @@ namespace SteamPlayerInvestigatorV2
         {
             throw new NotImplementedException();
         }
-        private Player handleGameList(string result, Player tempPlayer)
+        private void handleGameList(string result, string steamID)
         {
-            if (result != "{\"response\":{}}")
+            if (result.Contains("429 Too Many Requests"))
+            {
+                Thread.Sleep(3000);
+                handleGameList(returnApiReply(updateURI("gameList", steamID)), steamID);
+            }//If too many requests, waits a second and then redoes the request.
+
+            else if (result != "{\"response\":{}}")
             {
                 #region Seperating Data from JSON
                 result = result.Substring(38, result.Length - 44);
@@ -164,11 +163,12 @@ namespace SteamPlayerInvestigatorV2
                                 break;
                         }
                     }//Assigns data to relevant variables in game class.
-                    tempPlayer.gameList.Add(newGame);
+
+                    if (steamID == suspectID) { Suspect.Instance.playerData.gameList.Add(newGame); } //Adds to suspect
+                    else { Suspect.Instance.suspectList.Find(i => i.steamID == steamID).gameList.Add(newGame); } //Adds to bannedPlayer
                 }
                 #endregion
             }
-            return tempPlayer;
         }
         private Player handleLevel(string result, Player tempPlayer)
         {
@@ -359,6 +359,25 @@ namespace SteamPlayerInvestigatorV2
         }//Checks to see if provided APIKey is valid.
 
         #region Archived Code just incase
+
+        //public void bannedPlayersThreads(string threadType) {
+        //    foreach(Player bannedFriend in Suspect.Instance.suspectList) {
+
+        //        if (threads.Count == 50) { waitForAllThreads(); }
+        //        Thread thread = new Thread(() =>
+        //        {
+        //            if (threadType == "level") { handleLevel(returnApiReply(updateURI("level", bannedFriend.steamID)), bannedFriend); }
+        //            else if (threadType == "summary") { handleSummary(returnApiReply(updateURI("summary", bannedFriend.steamID)), bannedFriend); }
+        //            else if (threadType == "gameList") { handleGameList(returnApiReply(updateURI("gameList", bannedFriend.steamID)), bannedFriend); }
+        //            else if (threadType == "recentGames") { handleRecentGameList(returnApiReply(updateURI("recentGames", bannedFriend.steamID)), bannedFriend); }
+        //            else if (threadType == "UNIX") { }
+        //            else if (threadType == "Analysis") { }
+        //        });
+        //        threads.Add(thread); thread.Start();
+        //    }
+        //    waitForAllThreads();
+        //}//Deals with all threads using the suspectList - Summaries, level, game, recentgame requests. (UNIX Timestamp creations aswell as playerAnalysis) - may move to a different class
+
         //private void handleBans(string result, string steamID)
         //{
         //    Player tempPlayer = new Player();

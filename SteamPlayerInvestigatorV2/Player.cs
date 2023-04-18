@@ -8,7 +8,7 @@ namespace SteamPlayerInvestigatorV2
 {
     public class Player
     {
-        public Player() {} 
+        public Player() { gameList = new List<Game>(); recentlyPlayed = new List<Game>(); } 
 
         #region Account Info get; set;
         public string steamID { get; set; }
