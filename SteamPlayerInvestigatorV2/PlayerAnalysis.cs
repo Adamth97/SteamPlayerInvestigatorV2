@@ -55,10 +55,17 @@ namespace SteamPlayerInvestigatorV2
                     if (bannedPlayer.personaName[j] == bannedPlayer.personaName[j]) { currentSimilarity++;
                         percentageMatch = (bannedPlayer.personaName.Length / suspect.playerData.personaName.Length) * 100;
                     }
-                    else { if (currentSimilarity > highestSimiliarity) { highestSimiliarity = currentSimilarity; } }
+                    else { if (currentSimilarity > highestSimiliarity) { highestSimiliarity = currentSimilarity;
+                           if ((bannedPlayer.personaName.Length / highestSimiliarity) * 100 > percentageMatch) { percentageMatch = (bannedPlayer.personaName.Length / highestSimiliarity) * 100; }
+                        } 
+                    }
                 }//Finding similarites
 
-                if(percentageMatch == 100) { }
+                if (percentageMatch == 100) { bannedPlayer.suspectRating += 50; }
+                else if (percentageMatch >= 90) { bannedPlayer.suspectRating += 40; }
+                else if (percentageMatch >= 70 ) { bannedPlayer.suspectRating += 30; }
+                else if (percentageMatch >= 50) { bannedPlayer.suspectRating += 15; }
+                else if (percentageMatch >= 30) { bannedPlayer.suspectRating += 5; }
 
             }
         }//Compares persona names between suspect and bannedplayer, going off how many similarities in name, the longer the number of chars that are the same, the more suspicous. (blade42 && blade47) likely the same person
