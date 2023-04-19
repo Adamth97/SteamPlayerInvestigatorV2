@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -20,7 +21,23 @@ namespace SteamPlayerInvestigatorV2
         /// </summary>
         /// <param name="bannedPlayer"></param>
 
-        public void friendsListAnalysis(Player bannedPlayer) { }
+        public void friendsListAnalysis(Player bannedPlayer) {
+            int count = 0;
+            foreach (string player in suspect.playerData.friendsList) { if(bannedPlayer.friendsList.Contains(player)) count++; }
+            int percentageSimilarity = (count / suspect.playerData.friendsList.Count) * 100;
+
+            if (percentageSimilarity == 100) { bannedPlayer.suspectRating += 50; }
+            else if (percentageSimilarity >= 90) { bannedPlayer.suspectRating += 45; }
+            else if (percentageSimilarity >= 80) { bannedPlayer.suspectRating += 40; }
+            else if (percentageSimilarity >= 70) { bannedPlayer.suspectRating += 35; }
+            else if (percentageSimilarity >= 60) { bannedPlayer.suspectRating += 30; }
+            else if (percentageSimilarity >= 50) { bannedPlayer.suspectRating += 25; }
+            else if (percentageSimilarity >= 40) { bannedPlayer.suspectRating += 20; }
+            else if (percentageSimilarity >= 30) { bannedPlayer.suspectRating += 15; }
+            else if (percentageSimilarity >= 20) { bannedPlayer.suspectRating += 10; }
+            else if (percentageSimilarity >= 10) { bannedPlayer.suspectRating += 5; }
+
+        }
         public void evaluateUNIX(Player bannedPlayer) {
             int differenceInUnix = suspect.playerData.timeCreated - bannedPlayer.unixTimestampOfRecentBan;
             if (differenceInUnix <= 604800) { bannedPlayer.suspectRating += 100; }//A week
@@ -45,20 +62,9 @@ namespace SteamPlayerInvestigatorV2
 
                 for (int j = 0; j < suspect.playerData.personaName.Length; j++)
                 {
-                    if (bannedPlayer.personaName[j] == bannedPlayer.personaName[j]) { currentSimilarity++; }
+                    if (suspect.playerData.personaName[j] == bannedPlayer.personaName[j]) { currentSimilarity++; }
                     else { if (currentSimilarity > highestSimiliarity) { highestSimiliarity = currentSimilarity; 
                             percentageMatch = (suspect.playerData.personaName.Length /highestSimiliarity) * 100; } }
-                }//Finding similarites
-
-                for (int j = 0; j < bannedPlayer.personaName.Length; j++)
-                {
-                    if (bannedPlayer.personaName[j] == bannedPlayer.personaName[j]) { currentSimilarity++;
-                        percentageMatch = (bannedPlayer.personaName.Length / suspect.playerData.personaName.Length) * 100;
-                    }
-                    else { if (currentSimilarity > highestSimiliarity) { highestSimiliarity = currentSimilarity;
-                           if ((bannedPlayer.personaName.Length / highestSimiliarity) * 100 > percentageMatch) { percentageMatch = (bannedPlayer.personaName.Length / highestSimiliarity) * 100; }
-                        } 
-                    }
                 }//Finding similarites
 
                 if (percentageMatch == 100) { bannedPlayer.suspectRating += 50; }
@@ -98,6 +104,7 @@ namespace SteamPlayerInvestigatorV2
             {
                 Thread thread = new Thread(() =>
                 {
+                    friendsListAnalysis(bannedPlayer);
                     evaluateUNIX(bannedPlayer);
                     evaluatePlayerLevel(bannedPlayer);
                     compareAvatar(bannedPlayer);
@@ -106,7 +113,7 @@ namespace SteamPlayerInvestigatorV2
                     compareRecentGames(bannedPlayer);
                     comparePersonaName(bannedPlayer);
                 });
-                threads.Add(thread); thread.Start();
+                threads.Add(thread); thread.Start(); 
             }
             waitForAllThreads();
         }

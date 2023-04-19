@@ -179,27 +179,20 @@ namespace SteamPlayerInvestigatorV2
                 foreach (string game in gameList)
                 {
                     string[] gameData = game.Split(','); //Splits game from gameList into sections
-                    Game newGame = new Game();
+                    int gameID = 0;
                     for (int i = 0; i < gameData.Length; i++)
                     {
                         string[] tempArray = gameData[i].Split(':', 2);
                         switch (tempArray[0])
                         {
                             case "appid":
-                                newGame.gameID = (int.Parse(tempArray[1]));
-                                break;
-                            case "playtime_forever":
-                                newGame.playTime = (int.Parse(tempArray[1]));
-                                break;
-                            case "rtime_last_played":
-                                try { newGame.lastPlayed = (int.Parse(tempArray[1])); } catch { }
-
+                                gameID = (int.Parse(tempArray[1]));
                                 break;
                         }
                     }//Assigns data to relevant variables in game class.
 
-                    if (steamID == suspectID) { Suspect.Instance.playerData.recentlyPlayed.Add(newGame); } //Adds to suspect
-                    else { Suspect.Instance.suspectList.Find(i => i.steamID == steamID).recentlyPlayed.Add(newGame); } //Adds to bannedPlayer
+                    if (steamID == suspectID) { Suspect.Instance.playerData.recentlyPlayed.Add(gameID); } //Adds to suspect
+                    else { Suspect.Instance.suspectList.Find(i => i.steamID == steamID).recentlyPlayed.Add(gameID); } //Adds to bannedPlayer
                 }
                 #endregion
             }
@@ -224,27 +217,20 @@ namespace SteamPlayerInvestigatorV2
                 foreach (string game in gameList)
                 {
                     string[] gameData = game.Split(','); //Splits game from gameList into sections
-                    Game newGame = new Game();
+                    int gameID = 0;
                     for (int i = 0; i < gameData.Length; i++)
                     {
                         string[] tempArray = gameData[i].Split(':', 2);
                         switch (tempArray[0])
                         {
                             case "appid":
-                                newGame.gameID = (int.Parse(tempArray[1]));
-                                break;
-                            case "playtime_forever":
-                                newGame.playTime = (int.Parse(tempArray[1]));
-                                break;
-                            case "rtime_last_played":
-                                try { newGame.lastPlayed = (int.Parse(tempArray[1]));} catch { }
-                                
+                                gameID = (int.Parse(tempArray[1]));
                                 break;
                         }
                     }//Assigns data to relevant variables in game class.
 
-                    if (steamID == suspectID) { Suspect.Instance.playerData.gameList.Add(newGame); } //Adds to suspect
-                    else { Suspect.Instance.suspectList.Find(i => i.steamID == steamID).gameList.Add(newGame); } //Adds to bannedPlayer
+                    if (steamID == suspectID) { Suspect.Instance.playerData.gameList.Add(gameID); } //Adds to suspect
+                    else { Suspect.Instance.suspectList.Find(i => i.steamID == steamID).gameList.Add(gameID); } //Adds to bannedPlayer
                 }
                 #endregion
             }
@@ -339,6 +325,8 @@ namespace SteamPlayerInvestigatorV2
                     tempArray = tempArray[0].Split(':');
                     if(bannedPlayers) { Suspect.Instance.suspectList.Find(p => p.steamID == steamID).friendsList.Add(tempArray[1]); }//Tries to add steamID to players friends list.
                     else if (tempArray[1] != suspectID) { suspect.steamIDList.Add(tempArray[1]); }
+
+                    if (steamID == suspectID) { Suspect.Instance.playerData.friendsList.Add(tempArray[1]); }
 
                     //If steamID is not in the current steamIDList and is not equal to the suspect themself.
                 }
