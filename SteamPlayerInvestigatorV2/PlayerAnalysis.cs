@@ -21,6 +21,12 @@ namespace SteamPlayerInvestigatorV2
             else if (differenceInUnix <= 7889229) { bannedPlayer.suspectRating += 10; }//2-3 months
         }
         public void evaluatePlayerLevel(Player bannedPlayer) { 
+            if(bannedPlayer.steamLevel == 0){ bannedPlayer.suspectRating += 10; }
+            else if(bannedPlayer.steamLevel == 1) { bannedPlayer.suspectRating += 8; }
+            else if (bannedPlayer.steamLevel == 2) { bannedPlayer.suspectRating += 6; }
+            else if (bannedPlayer.steamLevel == 3) { bannedPlayer.suspectRating += 4; }
+            else if (bannedPlayer.steamLevel == 4) { bannedPlayer.suspectRating += 2; }
+            else if (bannedPlayer.steamLevel == 5) { bannedPlayer.suspectRating += 1; }
         }
         public void compareGameList(Player bannedPlayer) { }
         public void compareRecentGames(Player bannedPlayer) { }
@@ -46,7 +52,7 @@ namespace SteamPlayerInvestigatorV2
                     compareGameList(bannedPlayer);
                     compareRecentGames(bannedPlayer);
                 });
-                threads.Add(thread); thread.Start(); Thread.Sleep(999999999);
+                threads.Add(thread); thread.Start();
             }
             waitForAllThreads();
         }
