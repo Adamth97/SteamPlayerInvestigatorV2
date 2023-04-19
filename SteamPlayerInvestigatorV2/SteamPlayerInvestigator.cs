@@ -63,7 +63,7 @@ namespace SteamPlayerInvestigatorV2
                     #endregion
 
                     #region Getting Banned Players steamLevel
-                    ResultTxtbox.Text += "\r\nGathering BannedPlayers steamLevels...\r\n"; updateProgressBar();
+                    ResultTxtbox.Text += "\r\nGathering BannedPlayers Steam Levels...\r\n"; updateProgressBar();
                     apiRequest.gatherBPLevel();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
@@ -75,8 +75,9 @@ namespace SteamPlayerInvestigatorV2
                     #endregion
 
                     #region Assigning BannedPlayers a Suspect Rating
-                    ResultTxtbox.Text += "\r\nEvaluating all banned players, assigning suspect ratings...\r\n"; updateProgressBar();
-                    //evaluateBannedPlayers();
+                    ResultTxtbox.Text += "\r\nEvaluating all banned players, assigning Suspect Ratings...\r\n"; updateProgressBar();
+                    PlayerAnalysis playerAnalysis = new PlayerAnalysis();
+                    playerAnalysis.startAnalysis();
                     ResultTxtbox.Text += "Completed.\r\n";
                     #endregion
 
@@ -98,7 +99,6 @@ namespace SteamPlayerInvestigatorV2
                 int secondsSinceBan = player.daysSinceLastBan * 86400;
                 player.unixTimestampOfRecentBan = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds - secondsSinceBan;
             }
-        }
-        public void evaluateBannedPlayers() { }
+        }//Calculates the time difference between date of most recent ban and the account creation time of the suspect.
     }
 }
