@@ -20,7 +20,7 @@ namespace SteamPlayerInvestigatorV2
         /// </summary>
         /// <param name="bannedPlayer"></param>
 
-
+        public void friendsListAnalysis(Player bannedPlayer) { }
         public void evaluateUNIX(Player bannedPlayer) {
             int differenceInUnix = suspect.playerData.timeCreated - bannedPlayer.unixTimestampOfRecentBan;
             if (differenceInUnix <= 604800) { bannedPlayer.suspectRating += 100; }//A week
@@ -38,7 +38,31 @@ namespace SteamPlayerInvestigatorV2
             else if (bannedPlayer.steamLevel == 4) { bannedPlayer.suspectRating += 2; }
             else if (bannedPlayer.steamLevel == 5) { bannedPlayer.suspectRating += 1; }
         }//Adds to suspect rating of banned player based on Steam Level
-        public void comparePersonaName(Player bannedPlayer) { }
+        public void comparePersonaName(Player bannedPlayer) { 
+            if(bannedPlayer.personaName.Contains(suspect.playerData.personaName) || suspect.playerData.personaName.Contains(bannedPlayer.personaName)) { bannedPlayer.suspectRating += 20; }//If either name contains the other
+            else {
+                int currentSimilarity = 0; int highestSimiliarity = 0; int percentageMatch = 0;
+
+                for (int j = 0; j < suspect.playerData.personaName.Length; j++)
+                {
+                    if (bannedPlayer.personaName[j] == bannedPlayer.personaName[j]) { currentSimilarity++; }
+                    else { if (currentSimilarity > highestSimiliarity) { highestSimiliarity = currentSimilarity; 
+                            percentageMatch = (suspect.playerData.personaName.Length /highestSimiliarity) * 100; } }
+                }//Finding similarites
+
+                for (int j = 0; j < bannedPlayer.personaName.Length; j++)
+                {
+                    if (bannedPlayer.personaName[j] == bannedPlayer.personaName[j]) { currentSimilarity++;
+                        percentageMatch = (bannedPlayer.personaName.Length / suspect.playerData.personaName.Length) * 100;
+                    }
+                    else { if (currentSimilarity > highestSimiliarity) { highestSimiliarity = currentSimilarity; } }
+                }//Finding similarites
+
+                if(percentageMatch == 100) { }
+
+            }
+        }//Compares persona names between suspect and bannedplayer, going off how many similarities in name, the longer the number of chars that are the same, the more suspicous. (blade42 && blade47) likely the same person
+
         public void compareGameList(Player bannedPlayer) {
             if (bannedPlayer.gameList != null) { }
         }

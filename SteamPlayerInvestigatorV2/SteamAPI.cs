@@ -19,7 +19,7 @@ namespace SteamPlayerInvestigatorV2
             handleLevel(returnApiReply(updateURI("level", suspectID)), suspectID);//Gets suspects level
             handleGameList(returnApiReply(updateURI("gameList", suspectID)), suspectID);//Gets suspects gameList
             handleRecentGameList(returnApiReply(updateURI("recentGames", suspectID)), suspectID); // Gets suspects RecentGames
-            handleFriends(returnApiReply(updateURI("friends", suspectID)), suspectID); //Gets users friends.
+            handleFriends(returnApiReply(updateURI("friends", suspectID)), suspectID, false); //Gets users friends.
         }//Does all queries on suspect and assigns the data
         public void getFriendsofFriends(List<string> steamList) {
             int suspectFriendCount = steamList.Count;
@@ -28,7 +28,7 @@ namespace SteamPlayerInvestigatorV2
                 string steamID = steamList[i];
                 Thread thread = new Thread(() =>
                 {
-                    handleFriends(returnApiReply(updateURI("friends", steamID)), steamID);
+                    handleFriends(returnApiReply(updateURI("friends", steamID)), steamID, false);
                 });
                 thread.Name = "friends";
                 threads.Add(thread); thread.Start();
@@ -107,6 +107,20 @@ namespace SteamPlayerInvestigatorV2
                         handleLevel(returnApiReply(updateURI("level", player.steamID)), player.steamID);
                     });
                     threads.Add(thread); thread.Start(); 
+                }
+            }
+            waitForAllThreads();
+        }
+        public void gatherBPFriendsLists() {
+            foreach (Player player in Suspect.Instance.suspectList)
+            {
+                if (player.communityVisibilityState == 3)
+                {
+                    Thread thread = new Thread(() =>
+                    {
+                        handleFriends(returnApiReply(updateURI("friends", player.steamID)), player.steamID, true);
+                    });
+                    threads.Add(thread); thread.Start();
                 }
             }
             waitForAllThreads();
@@ -300,14 +314,14 @@ namespace SteamPlayerInvestigatorV2
                 }
             }
         }
-        private void handleFriends(string result, string steamID)
+        private void handleFriends(string result, string steamID, bool bannedPlayers)
         {
             if (result == "{}" || result.Contains("Access Denied")) { return; } //If profile is private and friendsList cannot be accessed.
 
             if (result.Contains("429 Too Many Requests"))
             {
                 Thread.Sleep(3000);
-                handleFriends(returnApiReply(updateURI("bans", steamID)), steamID);
+                handleFriends(returnApiReply(updateURI("bans", steamID)), steamID, bannedPlayers);
             }//If too many requests, waits a second and then redoes the request.
             else
             {
@@ -323,7 +337,8 @@ namespace SteamPlayerInvestigatorV2
                 {
                     string[] tempArray = splitResponse[i].Split(',', 2);
                     tempArray = tempArray[0].Split(':');
-                    if (tempArray[1] != suspectID) { suspect.steamIDList.Add(tempArray[1]); }
+                    if(bannedPlayers) { Suspect.Instance.suspectList.Find(p => p.steamID == steamID).friendsList.Add(tempArray[1]); }//Tries to add steamID to players friends list.
+                    else if (tempArray[1] != suspectID) { suspect.steamIDList.Add(tempArray[1]); }
 
                     //If steamID is not in the current steamIDList and is not equal to the suspect themself.
                 }

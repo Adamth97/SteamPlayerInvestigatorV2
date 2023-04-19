@@ -8,7 +8,7 @@ namespace SteamPlayerInvestigatorV2
 {
     public class Player
     {
-        public Player() { gameList = new List<Game>(); recentlyPlayed = new List<Game>(); } 
+        public Player() { gameList = new List<Game>(); recentlyPlayed = new List<Game>(); friendsList = new List<string>(); } 
 
         #region Account Info get; set;
         public string steamID { get; set; }
@@ -34,6 +34,8 @@ namespace SteamPlayerInvestigatorV2
         #region Misc get; set;
         public string locCountryCode { get; set; }
         public string locStateCode { get; set; }
+        public List<string> friendsList { get; set; }
         #endregion
+
     }
 }

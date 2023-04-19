@@ -52,7 +52,7 @@ namespace SteamPlayerInvestigatorV2
 
                     #region Getting Banned Players gameList
                     ResultTxtbox.Text += "\r\nGathering BannedPlayers GameList...\r\n"; updateProgressBar();
-                    apiRequest.gatherBPGameList();  
+                    apiRequest.gatherBPGameList();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
@@ -65,6 +65,12 @@ namespace SteamPlayerInvestigatorV2
                     #region Getting Banned Players steamLevel
                     ResultTxtbox.Text += "\r\nGathering BannedPlayers Steam Levels...\r\n"; updateProgressBar();
                     apiRequest.gatherBPLevel();
+                    ResultTxtbox.Text += "Gathered.\r\n";
+                    #endregion
+
+                    #region Getting Banned Players FriendsLists
+                    ResultTxtbox.Text += "\r\nGathering BannedPlayers FriendsLists...\r\n"; updateProgressBar();
+                    apiRequest.gatherBPFriendsLists();
                     ResultTxtbox.Text += "Gathered.\r\n";
                     #endregion
 
@@ -93,8 +99,9 @@ namespace SteamPlayerInvestigatorV2
         }
 
         public void updateProgressBar() { progressBar1.Value += 10; progressBar1.Refresh(); Application.DoEvents(); } //Used to increment the progress bar.
-        public void calculateTimestamps() { 
-            foreach(Player player in Suspect.Instance.suspectList)
+        public void calculateTimestamps()
+        {
+            foreach (Player player in Suspect.Instance.suspectList)
             {
                 int secondsSinceBan = player.daysSinceLastBan * 86400;
                 player.unixTimestampOfRecentBan = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds - secondsSinceBan;
