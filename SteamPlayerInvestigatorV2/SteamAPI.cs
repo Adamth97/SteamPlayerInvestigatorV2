@@ -74,6 +74,7 @@ namespace SteamPlayerInvestigatorV2
         public void gatherBPGameList() {
             foreach (Player player in Suspect.Instance.suspectList) { 
                 if(player.communityVisibilityState == 3) {
+                    if (threads.Count == 50) { waitForAllThreads(); }
                     Thread thread = new Thread(() =>
                     {
                         handleGameList(returnApiReply(updateURI("gameList", player.steamID)), player.steamID);
@@ -88,6 +89,7 @@ namespace SteamPlayerInvestigatorV2
             {
                 if (player.communityVisibilityState == 3)
                 {
+                    if (threads.Count == 50) { waitForAllThreads(); }
                     Thread thread = new Thread(() =>
                     {
                         handleRecentGameList(returnApiReply(updateURI("recentGames", player.steamID)), player.steamID);
@@ -102,6 +104,7 @@ namespace SteamPlayerInvestigatorV2
             {
                 if (player.communityVisibilityState == 3)
                 {
+                    if (threads.Count == 50) { waitForAllThreads(); }
                     Thread thread = new Thread(() =>
                     {
                         handleLevel(returnApiReply(updateURI("level", player.steamID)), player.steamID);

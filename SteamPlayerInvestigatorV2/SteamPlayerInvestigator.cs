@@ -29,16 +29,10 @@ namespace SteamPlayerInvestigatorV2
                     apiRequest.getFriendsofFriends(Suspect.Instance.steamIDList);
                     Suspect.Instance.steamIDList = Suspect.Instance.steamIDList.Distinct().ToList();
                     ResultTxtbox.Text += "Gathered.\r\n";
-
-                    if (Suspect.Instance.steamIDList.Count > 1000) { ResultTxtbox.Text += "\r\nSteamID List greater than 1000, Suspect gathering may take longer.\r\n"; }
-                    else if (Suspect.Instance.steamIDList.Count > 5000) { ResultTxtbox.Text += "\r\nSteamID List greater than 5000, Suspect gathering will take longer than normal.\r\n"; }
-                    else if (Suspect.Instance.steamIDList.Count > 10000) { ResultTxtbox.Text += "\r\nSteamID List greater than 10000, Suspect gathering will take long, please expect a delay in progress.\r\n"; }
-                    ResultTxtbox.Text += "The delay is due to SteamAPI, a limit of requests can be made by the same person each minute, this is to prevent DDOS attacks.\r\n";
-                    ResultTxtbox.Text += "This software has to send lots of requests, therefore a delay has to be put in place to prevent being blocked.\r\n\r\n";
                     #endregion
 
                     #region Iterate through steamIDList, if they have a ban, add them to suspectList.
-                    ResultTxtbox.Text += "Gathering Banned Friends...\r\n"; updateProgressBar();
+                    ResultTxtbox.Text += "\r\nGathering Banned Friends...\r\n"; updateProgressBar();
                     apiRequest.gatherSuspects();
                     Suspect.Instance.suspectList = Suspect.Instance.suspectList.Distinct().ToList();
                     ResultTxtbox.Text += "Gathered " + Suspect.Instance.suspectList.Count + " suspects.\r\n";

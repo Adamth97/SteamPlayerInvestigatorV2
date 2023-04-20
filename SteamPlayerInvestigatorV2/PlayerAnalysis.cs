@@ -22,6 +22,20 @@ namespace SteamPlayerInvestigatorV2
         /// <param name="bannedPlayer"></param>
 
         public void percentageSimilaritySuspectRatings(Player bannedPlayer, int percentageSimilarity) {
+            if (percentageSimilarity == 100) { bannedPlayer.suspectRating += 25; }
+            else if (percentageSimilarity >= 80) { bannedPlayer.suspectRating += 20; }
+            else if (percentageSimilarity >= 60) { bannedPlayer.suspectRating += 15; }
+            else if (percentageSimilarity >= 40) { bannedPlayer.suspectRating += 10; }
+            else if (percentageSimilarity >= 20) { bannedPlayer.suspectRating += 5; }
+        }
+        public void friendsListAnalysis(Player bannedPlayer) {
+            if(bannedPlayer.steamID == "76561199217074727")
+            {
+                int breakpoint = 0;
+            }
+            double similarity = suspect.playerData.friendsList.Intersect(bannedPlayer.friendsList).Count();
+            similarity = similarity / bannedPlayer.friendsList.Count();
+            double percentageSimilarity = similarity * 100;
             if (percentageSimilarity == 100) { bannedPlayer.suspectRating += 50; }
             else if (percentageSimilarity >= 90) { bannedPlayer.suspectRating += 45; }
             else if (percentageSimilarity >= 80) { bannedPlayer.suspectRating += 40; }
@@ -33,26 +47,27 @@ namespace SteamPlayerInvestigatorV2
             else if (percentageSimilarity >= 20) { bannedPlayer.suspectRating += 10; }
             else if (percentageSimilarity >= 10) { bannedPlayer.suspectRating += 5; }
         }
-        public void friendsListAnalysis(Player bannedPlayer) {
-            int percentageSimilarity = (suspect.playerData.friendsList.Intersect(bannedPlayer.friendsList).Count() / suspect.playerData.friendsList.Count) * 100;
-            percentageSimilaritySuspectRatings(bannedPlayer, percentageSimilarity);
-        }
         public void evaluateUNIX(Player bannedPlayer) {
             int differenceInUnix = suspect.playerData.timeCreated - bannedPlayer.unixTimestampOfRecentBan;
-            if (differenceInUnix <= 604800) { bannedPlayer.suspectRating += 100; }//A week
-            else if (differenceInUnix <= 1209600) { bannedPlayer.suspectRating += 80; }//1-2 weeks
-            else if (differenceInUnix <= 1814400) { bannedPlayer.suspectRating += 60; }//2-3 weeks
-            else if (differenceInUnix <= 2629743) { bannedPlayer.suspectRating += 40; }//3-4 weeks
-            else if (differenceInUnix <= 5259486) { bannedPlayer.suspectRating += 20; }//1-2 months
-            else if (differenceInUnix <= 7889229) { bannedPlayer.suspectRating += 10; }//2-3 months
+            if (differenceInUnix > 0) {
+                if (differenceInUnix <= 604800) { bannedPlayer.suspectRating += 100; }//A week
+                else if (differenceInUnix <= 1209600) { bannedPlayer.suspectRating += 80; }//1-2 weeks
+                else if (differenceInUnix <= 1814400) { bannedPlayer.suspectRating += 60; }//2-3 weeks
+                else if (differenceInUnix <= 2629743) { bannedPlayer.suspectRating += 40; }//3-4 weeks
+                else if (differenceInUnix <= 5259486) { bannedPlayer.suspectRating += 20; }//1-2 months
+                else if (differenceInUnix <= 7889229) { bannedPlayer.suspectRating += 10; }//2-3 months
+            }
         }//Adds to suspect rating of banned player based on suspect account creation in comparison to bannedPlayer most recent ban
         public void evaluatePlayerLevel(Player bannedPlayer) { 
-            if(bannedPlayer.steamLevel == 0){ bannedPlayer.suspectRating += 10; }
-            else if(bannedPlayer.steamLevel == 1) { bannedPlayer.suspectRating += 8; }
-            else if (bannedPlayer.steamLevel == 2) { bannedPlayer.suspectRating += 6; }
-            else if (bannedPlayer.steamLevel == 3) { bannedPlayer.suspectRating += 4; }
-            else if (bannedPlayer.steamLevel == 4) { bannedPlayer.suspectRating += 2; }
-            else if (bannedPlayer.steamLevel == 5) { bannedPlayer.suspectRating += 1; }
+            if(bannedPlayer.communityVisibilityState == 3)
+            {
+                if (bannedPlayer.steamLevel == 0) { bannedPlayer.suspectRating += 10; }
+                else if (bannedPlayer.steamLevel == 1) { bannedPlayer.suspectRating += 8; }
+                else if (bannedPlayer.steamLevel == 2) { bannedPlayer.suspectRating += 6; }
+                else if (bannedPlayer.steamLevel == 3) { bannedPlayer.suspectRating += 4; }
+                else if (bannedPlayer.steamLevel == 4) { bannedPlayer.suspectRating += 2; }
+                else if (bannedPlayer.steamLevel == 5) { bannedPlayer.suspectRating += 1; }
+            }
         }//Adds to suspect rating of banned player based on Steam Level
         public void comparePersonaName(Player bannedPlayer) { 
             if(bannedPlayer.personaName.Contains(suspect.playerData.personaName) || suspect.playerData.personaName.Contains(bannedPlayer.personaName)) { bannedPlayer.suspectRating += 20; }//If either name contains the other
@@ -106,6 +121,7 @@ namespace SteamPlayerInvestigatorV2
         {
             foreach(Player bannedPlayer in suspect.suspectList)
             {
+                
                 Thread thread = new Thread(() =>
                 {
                     friendsListAnalysis(bannedPlayer);
@@ -117,7 +133,9 @@ namespace SteamPlayerInvestigatorV2
                     compareRecentGames(bannedPlayer);
                     comparePersonaName(bannedPlayer);
                 });
-                threads.Add(thread); thread.Start(); 
+                threads.Add(thread);
+                thread.Start();
+                
             }
             waitForAllThreads();
         }
