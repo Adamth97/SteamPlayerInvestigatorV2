@@ -17,11 +17,13 @@ namespace SteamPlayerInvestigatorV2
                 apiRequest = new SteamAPI(APIKey, SteamID);
                 if (apiRequest.forbiddenCheck(APIKey, SteamID) == false)
                 {
-
+                    Suspect.Instance.resetPlayer();
                     #region Getting Information on Suspect and assigning it to playerData
                     ResultTxtbox.Text = "Gathering Suspect Data...\r\n"; updateProgressBar();
                     apiRequest.assignToSuspectData();
-                    ResultTxtbox.Text += "Gathered.\r\n";
+                    if(Suspect.Instance.playerData.friendsList.Count == 0) { ResultTxtbox.Text += "Could not retrieve Friends List, Friends List must not be public.\r\n"; return; }
+                    else { ResultTxtbox.Text += "Gathered.\r\n"; }
+                    
                     #endregion
 
                     #region Get friends of friends using Threads, add it to suspects steamIDlist.

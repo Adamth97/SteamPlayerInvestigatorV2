@@ -27,6 +27,7 @@ namespace SteamPlayerInvestigatorV2
         public List<Player> suspectList {  get; set; }
         public List<string> steamIDList { get; set; }
         public Player playerData { get; set; }
+        public void resetPlayer() { instance = new Suspect(); }
 
     }
 }
