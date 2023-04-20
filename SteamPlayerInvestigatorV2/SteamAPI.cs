@@ -331,7 +331,7 @@ namespace SteamPlayerInvestigatorV2
                 {
                     string[] tempArray = splitResponse[i].Split(',', 2);
                     tempArray = tempArray[0].Split(':');
-                    if(bannedPlayers) { Suspect.Instance.suspectList.Find(p => p.steamID == steamID).friendsList.Add(tempArray[1]); }//Tries to add steamID to players friends list.
+                    if(bannedPlayers && steamID != suspectID) { Suspect.Instance.suspectList.Find(p => p.steamID == steamID).friendsList.Add(tempArray[1]); }//If banned player and friend is not equal to suspect
                     else if (tempArray[1] != suspectID) { suspect.steamIDList.Add(tempArray[1]); }
 
                     if (steamID == suspectID) { Suspect.Instance.playerData.friendsList.Add(tempArray[1]); }
@@ -348,7 +348,7 @@ namespace SteamPlayerInvestigatorV2
                 Thread.Sleep(3000);
                 handleSummary(returnApiReply(updateURI("summary", steamIDs)), steamIDs);
             }//If too many requests, waits a second and then redoes the request.
-            else if (result != "{}" || !result.Contains(":[]}}"))
+            else if (result != "{}" && !result.Contains("{\"response\":{\"players\":[]}}"))
             {
 
                 #region Seperating Info from APIResponse

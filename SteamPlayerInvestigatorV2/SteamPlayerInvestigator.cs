@@ -16,13 +16,14 @@ namespace SteamPlayerInvestigatorV2
             {
                 apiRequest = new SteamAPI(APIKey, SteamID);
                 if (apiRequest.forbiddenCheck(APIKey, SteamID) == false)
-                {
+                { 
                     Suspect.Instance.resetPlayer();//Incase this is a request following another request, clears the data of the previous suspect.
 
                     #region Getting Information on Suspect and assigning it to playerData
                     ResultTxtbox.Text = "Gathering Suspect Data...\r\n"; updateProgressBar();
                     apiRequest.assignToSuspectData();
-                    if (Suspect.Instance.playerData.friendsList.Count == 0) { ResultTxtbox.Text += "Could not retrieve Friends List, Friends List must not be public.\r\n"; return; }
+                    if(Suspect.Instance.playerData == null) { ResultTxtbox.Text += "Could not retrieve Suspect Summary, Account is private.\r\n"; return; }
+                    else if (Suspect.Instance.playerData.friendsList.Count == 0) { ResultTxtbox.Text += "Could not retrieve Friends List, Friends List must not be public.\r\n"; return; }
                     else { ResultTxtbox.Text += "Gathered.\r\n"; }
 
                     #endregion
