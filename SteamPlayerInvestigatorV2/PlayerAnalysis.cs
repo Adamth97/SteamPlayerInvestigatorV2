@@ -29,10 +29,6 @@ namespace SteamPlayerInvestigatorV2
             else if (percentageSimilarity >= 20) { bannedPlayer.suspectRating += 5; }
         }
         public void friendsListAnalysis(Player bannedPlayer) {
-            if(bannedPlayer.steamID == "76561199217074727")
-            {
-                int breakpoint = 0;
-            }
             double similarity = suspect.playerData.friendsList.Intersect(bannedPlayer.friendsList).Count();
             similarity = similarity / bannedPlayer.friendsList.Count();
             double percentageSimilarity = similarity * 100;

@@ -84,7 +84,7 @@ namespace SteamPlayerInvestigatorV2
                     #endregion
 
                     #region Display Results
-                    updateProgressBar();
+                    displayResults();  updateProgressBar();
                     #endregion
 
                 }//Checks validty of steamAPI Key
@@ -92,6 +92,17 @@ namespace SteamPlayerInvestigatorV2
 
             }//Information Entered
             else { ResultTxtbox.Text = "---Analysis Failure!--- \r\nPlease ensure that the APIKey and SteamID are entered.\r\nIf they are already entered, ensure they are correct."; }
+        }
+
+        private void displayResults()
+        {
+            ResultTxtbox.Clear(); ResultTxtbox.Text += "---Analysis Completed!--- \r\nThe following is a list of all banned accounts, from most to least suspicous.\r\n" +
+                "The format of the results are Name: Rating (SteamID), The higher the Rating, the more suspicous the account is. \r\n" +
+                "Bear in mind ALL of these accounts have a VAC ban.\r\n\r\n";
+            foreach(Player bannedPlayer in Suspect.Instance.suspectList)
+            {
+                ResultTxtbox.Text += bannedPlayer.personaName + ": " + bannedPlayer.suspectRating + " (" + bannedPlayer.steamID + ")\r\n";
+            }
         }
 
         public void updateProgressBar() { progressBar1.Value += 10; progressBar1.Refresh(); Application.DoEvents(); } //Used to increment the progress bar.
