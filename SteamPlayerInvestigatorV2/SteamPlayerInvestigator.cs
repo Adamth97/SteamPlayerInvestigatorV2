@@ -120,13 +120,15 @@ namespace SteamPlayerInvestigatorV2
 
         private void Savebtn_Click(object sender, EventArgs e)
         {
-            if (ResultTxtbox.Text.Contains("---Analysis Completed!---")) { 
-            StreamWriter sw = new StreamWriter(Suspect.Instance.playerData.steamID + " - " + DateTime.Now.ToString() + ".txt");
+            if (ResultTxtbox.Text.Contains("---Analysis Completed!---")) {
+                string fileName = Suspect.Instance.playerData.personaName + " - " + DateTime.Now.ToString() + ".txt"; 
+                fileName = fileName.Replace("/", "-"); fileName = fileName.Replace(':', '-');
+                StreamWriter sw = new StreamWriter(fileName);
                 sw.Write(ResultTxtbox.Text);
                 sw.Close();
+                ResultTxtbox.Clear(); 
+                ResultTxtbox.Text = "---Analysis Saved!---\r\nIt has been saved under " + fileName;
             }
-
-            ResultTxtbox.Clear(); ResultTxtbox.Text = "---Analysis Saved!---";
         }
     }
 }
