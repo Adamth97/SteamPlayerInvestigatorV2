@@ -66,6 +66,7 @@ namespace SteamPlayerInvestigatorV2
             }
         }//Adds to suspect rating of banned player based on Steam Level
         public void comparePersonaName(Player bannedPlayer) { 
+            if(bannedPlayer.personaName == null) { return; }
             if(bannedPlayer.personaName.Contains(suspect.playerData.personaName) || suspect.playerData.personaName.Contains(bannedPlayer.personaName)) { bannedPlayer.suspectRating += 20; }//If either name contains the other
 
             int numberOfChangesRequired = 0, iterate = 0;

@@ -103,7 +103,7 @@ namespace SteamPlayerInvestigatorV2
             {
                 ResultTxtbox.Text += bannedPlayer.personaName + ": " + bannedPlayer.suspectRating + " (" + bannedPlayer.steamID + ")\r\n";
             }
-        }
+        }//Displays Results
 
         public void updateProgressBar() { progressBar1.Value += 10; progressBar1.Refresh(); Application.DoEvents(); } //Used to increment the progress bar.
         public void calculateTimestamps()
