@@ -150,6 +150,7 @@
             Savebtn.TabIndex = 9;
             Savebtn.Text = "Save Results";
             Savebtn.UseVisualStyleBackColor = false;
+            Savebtn.Click += Savebtn_Click;
             // 
             // progressBar1
             // 

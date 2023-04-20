@@ -17,13 +17,14 @@ namespace SteamPlayerInvestigatorV2
                 apiRequest = new SteamAPI(APIKey, SteamID);
                 if (apiRequest.forbiddenCheck(APIKey, SteamID) == false)
                 {
-                    Suspect.Instance.resetPlayer();
+                    Suspect.Instance.resetPlayer();//Incase this is a request following another request, clears the data of the previous suspect.
+
                     #region Getting Information on Suspect and assigning it to playerData
                     ResultTxtbox.Text = "Gathering Suspect Data...\r\n"; updateProgressBar();
                     apiRequest.assignToSuspectData();
-                    if(Suspect.Instance.playerData.friendsList.Count == 0) { ResultTxtbox.Text += "Could not retrieve Friends List, Friends List must not be public.\r\n"; return; }
+                    if (Suspect.Instance.playerData.friendsList.Count == 0) { ResultTxtbox.Text += "Could not retrieve Friends List, Friends List must not be public.\r\n"; return; }
                     else { ResultTxtbox.Text += "Gathered.\r\n"; }
-                    
+
                     #endregion
 
                     #region Get friends of friends using Threads, add it to suspects steamIDlist.
@@ -86,7 +87,7 @@ namespace SteamPlayerInvestigatorV2
                     #endregion
 
                     #region Display Results
-                    displayResults();  updateProgressBar();
+                    displayResults(); updateProgressBar();
                     #endregion
 
                 }//Checks validty of steamAPI Key
@@ -101,7 +102,7 @@ namespace SteamPlayerInvestigatorV2
             ResultTxtbox.Clear(); ResultTxtbox.Text += "---Analysis Completed!--- \r\nThe following is a list of all banned accounts, from most to least suspicous.\r\n" +
                 "The format of the results are Name: Rating (SteamID), The higher the Rating, the more suspicous the account is. \r\n" +
                 "Bear in mind ALL of these accounts have a VAC ban.\r\n\r\n";
-            foreach(Player bannedPlayer in Suspect.Instance.suspectList)
+            foreach (Player bannedPlayer in Suspect.Instance.suspectList)
             {
                 ResultTxtbox.Text += bannedPlayer.personaName + ": " + bannedPlayer.suspectRating + " (" + bannedPlayer.steamID + ")\r\n";
             }
@@ -116,5 +117,16 @@ namespace SteamPlayerInvestigatorV2
                 player.unixTimestampOfRecentBan = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds - secondsSinceBan;
             }
         }//Calculates the time difference between date of most recent ban and the account creation time of the suspect.
+
+        private void Savebtn_Click(object sender, EventArgs e)
+        {
+            if (ResultTxtbox.Text.Contains("---Analysis Completed!---")) { 
+            StreamWriter sw = new StreamWriter(Suspect.Instance.playerData.steamID + " - " + DateTime.Now.ToString() + ".txt");
+                sw.Write(ResultTxtbox.Text);
+                sw.Close();
+            }
+
+            ResultTxtbox.Clear(); ResultTxtbox.Text = "---Analysis Saved!---";
+        }
     }
 }
