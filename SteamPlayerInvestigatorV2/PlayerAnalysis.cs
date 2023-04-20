@@ -21,11 +21,7 @@ namespace SteamPlayerInvestigatorV2
         /// </summary>
         /// <param name="bannedPlayer"></param>
 
-        public void friendsListAnalysis(Player bannedPlayer) {
-            int count = 0;
-            foreach (string player in suspect.playerData.friendsList) { if(bannedPlayer.friendsList.Contains(player)) count++; }
-            int percentageSimilarity = (count / suspect.playerData.friendsList.Count) * 100;
-
+        public void percentageSimilaritySuspectRatings(Player bannedPlayer, int percentageSimilarity) {
             if (percentageSimilarity == 100) { bannedPlayer.suspectRating += 50; }
             else if (percentageSimilarity >= 90) { bannedPlayer.suspectRating += 45; }
             else if (percentageSimilarity >= 80) { bannedPlayer.suspectRating += 40; }
@@ -36,7 +32,10 @@ namespace SteamPlayerInvestigatorV2
             else if (percentageSimilarity >= 30) { bannedPlayer.suspectRating += 15; }
             else if (percentageSimilarity >= 20) { bannedPlayer.suspectRating += 10; }
             else if (percentageSimilarity >= 10) { bannedPlayer.suspectRating += 5; }
-
+        }
+        public void friendsListAnalysis(Player bannedPlayer) {
+            int percentageSimilarity = (suspect.playerData.friendsList.Intersect(bannedPlayer.friendsList).Count() / suspect.playerData.friendsList.Count) * 100;
+            percentageSimilaritySuspectRatings(bannedPlayer, percentageSimilarity);
         }
         public void evaluateUNIX(Player bannedPlayer) {
             int differenceInUnix = suspect.playerData.timeCreated - bannedPlayer.unixTimestampOfRecentBan;
@@ -57,30 +56,35 @@ namespace SteamPlayerInvestigatorV2
         }//Adds to suspect rating of banned player based on Steam Level
         public void comparePersonaName(Player bannedPlayer) { 
             if(bannedPlayer.personaName.Contains(suspect.playerData.personaName) || suspect.playerData.personaName.Contains(bannedPlayer.personaName)) { bannedPlayer.suspectRating += 20; }//If either name contains the other
-            else {
-                int currentSimilarity = 0; int highestSimiliarity = 0; int percentageMatch = 0;
 
-                for (int j = 0; j < suspect.playerData.personaName.Length; j++)
-                {
-                    if (suspect.playerData.personaName[j] == bannedPlayer.personaName[j]) { currentSimilarity++; }
-                    else { if (currentSimilarity > highestSimiliarity) { highestSimiliarity = currentSimilarity; 
-                            percentageMatch = (suspect.playerData.personaName.Length /highestSimiliarity) * 100; } }
-                }//Finding similarites
+            int numberOfChangesRequired = 0, iterate = 0;
 
-                if (percentageMatch == 100) { bannedPlayer.suspectRating += 50; }
-                else if (percentageMatch >= 90) { bannedPlayer.suspectRating += 40; }
-                else if (percentageMatch >= 70 ) { bannedPlayer.suspectRating += 30; }
-                else if (percentageMatch >= 50) { bannedPlayer.suspectRating += 15; }
-                else if (percentageMatch >= 30) { bannedPlayer.suspectRating += 5; }
+            if(bannedPlayer.personaName.Length > suspect.playerData.personaName.Length) { numberOfChangesRequired += bannedPlayer.personaName.Length - suspect.playerData.personaName.Length;
+                iterate = suspect.playerData.personaName.Length; } //BannedPlayer persona longer then suspects
+            else { numberOfChangesRequired += suspect.playerData.personaName.Length - bannedPlayer.personaName.Length;
+                iterate = bannedPlayer.personaName.Length; }//Suspect persona longer than bannedPlayer
 
-            }
-        }//Compares persona names between suspect and bannedplayer, going off how many similarities in name, the longer the number of chars that are the same, the more suspicous. (blade42 && blade47) likely the same person
+            for (int i = 0; i < iterate; i++)
+            {
+                if (bannedPlayer.personaName[i] != suspect.playerData.personaName[i]) { numberOfChangesRequired++; }
+            }//The more similar the names, the less number of changes required.
 
+            if(numberOfChangesRequired == 0) { bannedPlayer.suspectRating += 100; }//Both can have the same persona name
+            else if (numberOfChangesRequired == 1) { bannedPlayer.suspectRating += 75; }
+            else if (numberOfChangesRequired == 2) { bannedPlayer.suspectRating += 50; }
+            else if (numberOfChangesRequired == 3) { bannedPlayer.suspectRating += 25; }
+        }//Calculates number of char changes to make bannedPlayer persona into the suspects.
         public void compareGameList(Player bannedPlayer) {
-            if (bannedPlayer.gameList != null) { }
+            if (bannedPlayer.gameList.Count != 0) {
+                int percentageSimilarity = (suspect.playerData.gameList.Intersect(bannedPlayer.gameList).Count() / suspect.playerData.gameList.Count) * 100;
+                percentageSimilaritySuspectRatings(bannedPlayer, percentageSimilarity);
+            }
         }
         public void compareRecentGames(Player bannedPlayer) { 
-            if(bannedPlayer.recentlyPlayed != null) { }
+            if(bannedPlayer.recentlyPlayed.Count != 0) {
+                int percentageSimilarity = (suspect.playerData.recentlyPlayed.Intersect(bannedPlayer.recentlyPlayed).Count() / suspect.playerData.recentlyPlayed.Count) * 100;
+                percentageSimilaritySuspectRatings(bannedPlayer, percentageSimilarity);
+            }
         }
         public void comparePrimaryClan(Player bannedPlayer) {
             if(bannedPlayer.primaryClanID == suspect.playerData.primaryClanID) { bannedPlayer.suspectRating += 3; }

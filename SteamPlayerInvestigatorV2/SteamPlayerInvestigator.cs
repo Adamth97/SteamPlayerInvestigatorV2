@@ -84,6 +84,8 @@ namespace SteamPlayerInvestigatorV2
                     ResultTxtbox.Text += "\r\nEvaluating all banned players, assigning Suspect Ratings...\r\n"; updateProgressBar();
                     PlayerAnalysis playerAnalysis = new PlayerAnalysis();
                     playerAnalysis.startAnalysis();
+                    Suspect.Instance.suspectList = Suspect.Instance.suspectList.OrderBy(o => o.suspectRating).ToList();
+                    Suspect.Instance.suspectList.Reverse();
                     ResultTxtbox.Text += "Completed.\r\n";
                     #endregion
 
