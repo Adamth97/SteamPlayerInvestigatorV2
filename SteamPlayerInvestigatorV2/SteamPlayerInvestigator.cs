@@ -28,7 +28,7 @@ namespace SteamPlayerInvestigatorV2
                     ResultTxtbox.Text += "\r\nGathering Friends of Friends...\r\n"; updateProgressBar();
                     apiRequest.getFriendsofFriends(Suspect.Instance.steamIDList);
                     Suspect.Instance.steamIDList = Suspect.Instance.steamIDList.Distinct().ToList();
-                    ResultTxtbox.Text += "Gathered.\r\n";
+                    ResultTxtbox.Text += "Gathered " + Suspect.Instance.steamIDList.Count + " accounts. \r\n";
                     #endregion
 
                     #region Iterate through steamIDList, if they have a ban, add them to suspectList.
