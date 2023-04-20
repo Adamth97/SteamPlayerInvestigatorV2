@@ -116,7 +116,6 @@
             ApiKeyTxtbox.PlaceholderText = "Please enter the ApiKey here.";
             ApiKeyTxtbox.Size = new Size(191, 23);
             ApiKeyTxtbox.TabIndex = 6;
-            ApiKeyTxtbox.Text = "30FD39066A9E2628D7CDE47C35CAE10A";
             // 
             // SteamIDTxtbox
             // 
@@ -126,7 +125,6 @@
             SteamIDTxtbox.PlaceholderText = "Please enter the SteamID here.";
             SteamIDTxtbox.Size = new Size(191, 23);
             SteamIDTxtbox.TabIndex = 7;
-            SteamIDTxtbox.Text = "76561198440969812";
             // 
             // AnalyseBtn
             // 

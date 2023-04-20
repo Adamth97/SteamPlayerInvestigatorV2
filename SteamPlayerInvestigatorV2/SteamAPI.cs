@@ -16,10 +16,15 @@ namespace SteamPlayerInvestigatorV2
         public SteamAPI(string APIKey, string SteamID) { ApiKey = APIKey; suspectID = SteamID; }
         public void assignToSuspectData() { 
             handleSummary(returnApiReply(updateURI("summary", suspectID)), suspectID); //Gets suspects Summary Data 
-            handleLevel(returnApiReply(updateURI("level", suspectID)), suspectID);//Gets suspects level
-            handleGameList(returnApiReply(updateURI("gameList", suspectID)), suspectID);//Gets suspects gameList
-            handleRecentGameList(returnApiReply(updateURI("recentGames", suspectID)), suspectID); // Gets suspects RecentGames
-            handleFriends(returnApiReply(updateURI("friends", suspectID)), suspectID, false); //Gets users friends.
+            if (Suspect.Instance.playerData != null)
+            {
+                handleLevel(returnApiReply(updateURI("level", suspectID)), suspectID);//Gets suspects level
+                handleGameList(returnApiReply(updateURI("gameList", suspectID)), suspectID);//Gets suspects gameList
+                handleRecentGameList(returnApiReply(updateURI("recentGames", suspectID)), suspectID); // Gets suspects RecentGames
+                handleFriends(returnApiReply(updateURI("friends", suspectID)), suspectID, false); //Gets users friends.
+            }
+            else { return; }
+            
         }//Does all queries on suspect and assigns the data
         public void getFriendsofFriends(List<string> steamList) {
             int suspectFriendCount = steamList.Count;
@@ -343,7 +348,7 @@ namespace SteamPlayerInvestigatorV2
                 Thread.Sleep(3000);
                 handleSummary(returnApiReply(updateURI("summary", steamIDs)), steamIDs);
             }//If too many requests, waits a second and then redoes the request.
-            else if (result != "{}")
+            else if (result != "{}" || !result.Contains(":[]}}"))
             {
 
                 #region Seperating Info from APIResponse
