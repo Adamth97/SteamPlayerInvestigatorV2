@@ -8,7 +8,7 @@ namespace SteamPlayerInvestigatorV2
             InitializeComponent();
         }
 
-        private async void AnalyseBtn_Click(object sender, EventArgs e)
+        private void AnalyseBtn_Click(object sender, EventArgs e)
         {
             ResultTxtbox.Clear(); progressBar1.Value = 0; Application.DoEvents();//Clears Result Box
             string APIKey = ApiKeyTxtbox.Text; string SteamID = SteamIDTxtbox.Text;

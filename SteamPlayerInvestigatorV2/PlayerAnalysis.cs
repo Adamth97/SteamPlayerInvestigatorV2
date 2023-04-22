@@ -21,7 +21,7 @@ namespace SteamPlayerInvestigatorV2
         /// </summary>
         /// <param name="bannedPlayer"></param>
 
-        public void percentageSimilaritySuspectRatings(Player bannedPlayer, int percentageSimilarity) {
+        public void percentageSimilaritySuspectRatings(Player bannedPlayer, double percentageSimilarity) {
             if (percentageSimilarity == 100) { bannedPlayer.suspectRating += 25; }
             else if (percentageSimilarity >= 80) { bannedPlayer.suspectRating += 20; }
             else if (percentageSimilarity >= 60) { bannedPlayer.suspectRating += 15; }
@@ -65,9 +65,9 @@ namespace SteamPlayerInvestigatorV2
                 else if (bannedPlayer.steamLevel == 5) { bannedPlayer.suspectRating += 1; }
             }
         }//Adds to suspect rating of banned player based on Steam Level
-        public void comparePersonaName(Player bannedPlayer) { 
+        public void comparePersonaName(Player bannedPlayer) {
             if(bannedPlayer.personaName == null) { return; }
-            if(bannedPlayer.personaName.Contains(suspect.playerData.personaName) || suspect.playerData.personaName.Contains(bannedPlayer.personaName)) { bannedPlayer.suspectRating += 20; }//If either name contains the other
+            if(bannedPlayer.personaName.Contains(suspect.playerData.personaName) || suspect.playerData.personaName.Contains(bannedPlayer.personaName)) { bannedPlayer.suspectRating += 100; return; }//If either name contains the other
 
             int numberOfChangesRequired = 0, iterate = 0;
 
@@ -88,14 +88,16 @@ namespace SteamPlayerInvestigatorV2
         }//Calculates number of char changes to make bannedPlayer persona into the suspects.
         public void compareGameList(Player bannedPlayer) {
             if (bannedPlayer.gameList.Count != 0) {
-                int percentageSimilarity = (suspect.playerData.gameList.Intersect(bannedPlayer.gameList).Count() / suspect.playerData.gameList.Count) * 100;
-                percentageSimilaritySuspectRatings(bannedPlayer, percentageSimilarity);
+                double similarity = suspect.playerData.gameList.Intersect(bannedPlayer.gameList).Count();
+                similarity = similarity / bannedPlayer.gameList.Count() * 100;
+                percentageSimilaritySuspectRatings(bannedPlayer, similarity);
             }
         }
-        public void compareRecentGames(Player bannedPlayer) { 
+        public void compareRecentGames(Player bannedPlayer) {
             if(bannedPlayer.recentlyPlayed.Count != 0) {
-                int percentageSimilarity = (suspect.playerData.recentlyPlayed.Intersect(bannedPlayer.recentlyPlayed).Count() / suspect.playerData.recentlyPlayed.Count) * 100;
-                percentageSimilaritySuspectRatings(bannedPlayer, percentageSimilarity);
+                double similarity = suspect.playerData.recentlyPlayed.Intersect(bannedPlayer.recentlyPlayed).Count();
+                similarity = similarity / bannedPlayer.recentlyPlayed.Count() * 100;
+                percentageSimilaritySuspectRatings(bannedPlayer, similarity);
             }
         }
         public void comparePrimaryClan(Player bannedPlayer) {
