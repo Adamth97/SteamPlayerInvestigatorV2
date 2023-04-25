@@ -433,7 +433,7 @@ namespace SteamPlayerInvestigatorV2
                 client.BaseAddress = new Uri("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" + APIKey + "&steamids=" + steamID);
                 HttpResponseMessage response = client.GetAsync(client.BaseAddress).Result;
 
-                if (response.ReasonPhrase == "Forbidden") { return true; }
+                if (response.ReasonPhrase == "Forbidden" || response.ReasonPhrase == "Bad Gateway") { return true; }
                 return false;
             } catch { return true; }
             

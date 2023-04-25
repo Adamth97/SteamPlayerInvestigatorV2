@@ -92,7 +92,7 @@ namespace SteamPlayerInvestigatorV2
                     #endregion
 
                 }//Checks validty of steamAPI Key
-                else { ResultTxtbox.Text = "---Forbidden!--- \r\nPlease ensure that the APIKey is correct.\r\nThe APIKey you have entered could be invalid!\r\nIf you have just done a big request, please ensure you wait before sending another request."; }
+                else { ResultTxtbox.Text = "---Forbidden!--- \r\nPlease ensure that the APIKey is correct.\r\nThe APIKey you have entered could be invalid!\r\nIf you have just done a big request, please ensure you wait before sending another request.\r\nPlease check to see if Steam is down."; }
 
             }//Information Entered
             else { ResultTxtbox.Text = "---Analysis Failure!--- \r\nPlease ensure that the APIKey and SteamID are entered.\r\nIf they are already entered, ensure they are correct."; }
