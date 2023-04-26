@@ -102,13 +102,14 @@ namespace SteamPlayerInvestigatorV2
         {
             ResultTxtbox.Clear(); ResultTxtbox.Text += "---Analysis Completed!--- \r\nThe following is a list of all banned accounts, from most to least suspicous.\r\n" +
                 "The format of the results are Name: Rating (SteamID) - Privacy, The higher the Rating, the more suspicous the account is. \r\n" +
-                "Bear in mind ALL of these accounts have a VAC ban.\r\n\r\n";
+                "Bear in mind ALL of these accounts have a VAC ban.\r\n\r\n"; Application.DoEvents();
             foreach (Player bannedPlayer in Suspect.Instance.suspectList)
             {
                 ResultTxtbox.Text += bannedPlayer.personaName + ": " + bannedPlayer.suspectRating + " (" + bannedPlayer.steamID + ") - ";
                 if (bannedPlayer.communityVisibilityState == 3) { ResultTxtbox.Text += "Public\r\n"; }
                 else if (bannedPlayer.communityVisibilityState == 2) { ResultTxtbox.Text += "Restricted To Friends\r\n"; }
                 else { ResultTxtbox.Text += "Private\r\n"; }
+                Application.DoEvents();
             }
         }//Displays Results
 

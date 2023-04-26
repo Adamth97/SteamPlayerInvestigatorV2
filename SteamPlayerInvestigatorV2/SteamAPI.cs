@@ -315,28 +315,31 @@ namespace SteamPlayerInvestigatorV2
             if (result.Contains("429 Too Many Requests"))
             {
                 Thread.Sleep(3000);
-                handleFriends(returnApiReply(updateURI("bans", steamID)), steamID, bannedPlayers);
+                handleFriends(returnApiReply(updateURI("friends", steamID)), steamID, bannedPlayers);
             }//If too many requests, waits a second and then redoes the request.
             else
             {
                 #region Seperating Info from APIResponse
-                result = result.Remove(0, 28);
-                result = result.Remove((result.Length - 4), 4);
-                result = result.Replace("\"", "");
-                result = result.Replace(",{", "");
-                #endregion
-                Suspect suspect = Suspect.Instance;
-                string[] splitResponse = result.Split('}');
-                for (int i = 0; i < splitResponse.Length; i++)
+               if(!result.Contains("{\"friendslist\":{\"friends\":[]}"))
                 {
-                    string[] tempArray = splitResponse[i].Split(',', 2);
-                    tempArray = tempArray[0].Split(':');
-                    if(bannedPlayers && steamID != suspectID) { Suspect.Instance.suspectList.Find(p => p.steamID == steamID).friendsList.Add(tempArray[1]); }//If banned player and friend is not equal to suspect
-                    else if (tempArray[1] != suspectID) { suspect.steamIDList.Add(tempArray[1]); }
+                    result = result.Remove(0, 28);
+                    result = result.Remove((result.Length - 4), 4);
+                    result = result.Replace("\"", "");
+                    result = result.Replace(",{", "");
+                    #endregion
+                    Suspect suspect = Suspect.Instance;
+                    string[] splitResponse = result.Split('}');
+                    for (int i = 0; i < splitResponse.Length; i++)
+                    {
+                        string[] tempArray = splitResponse[i].Split(',', 2);
+                        tempArray = tempArray[0].Split(':');
+                        if (bannedPlayers && steamID != suspectID) { Suspect.Instance.suspectList.Find(p => p.steamID == steamID).friendsList.Add(tempArray[1]); }//If banned player and friend is not equal to suspect
+                        else if (tempArray[1] != suspectID) { suspect.steamIDList.Add(tempArray[1]); }
 
-                    if (steamID == suspectID) { Suspect.Instance.playerData.friendsList.Add(tempArray[1]); }
+                        if (steamID == suspectID) { Suspect.Instance.playerData.friendsList.Add(tempArray[1]); }
 
-                    //If steamID is not in the current steamIDList and is not equal to the suspect themself.
+                        //If steamID is not in the current steamIDList and is not equal to the suspect themself.
+                    }
                 }
             }
 

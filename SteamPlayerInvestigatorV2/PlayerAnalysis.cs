@@ -32,17 +32,17 @@ namespace SteamPlayerInvestigatorV2
             double similarity = suspect.playerData.friendsList.Intersect(bannedPlayer.friendsList).Count();
             similarity = similarity / suspect.playerData.friendsList.Count();
             double percentageSimilarity = similarity * 100;
-            if (percentageSimilarity == 100) { bannedPlayer.suspectRating += 50; }
-            else if (percentageSimilarity >= 90) { bannedPlayer.suspectRating += 45; }
-            else if (percentageSimilarity >= 80) { bannedPlayer.suspectRating += 40; }
-            else if (percentageSimilarity >= 70) { bannedPlayer.suspectRating += 35; }
-            else if (percentageSimilarity >= 60) { bannedPlayer.suspectRating += 30; }
-            else if (percentageSimilarity >= 50) { bannedPlayer.suspectRating += 25; }
-            else if (percentageSimilarity >= 40) { bannedPlayer.suspectRating += 20; }
-            else if (percentageSimilarity >= 30) { bannedPlayer.suspectRating += 15; }
+            if (percentageSimilarity == 100) { bannedPlayer.suspectRating += 75; }
+            else if (percentageSimilarity >= 90) { bannedPlayer.suspectRating += 70; }
+            else if (percentageSimilarity >= 80) { bannedPlayer.suspectRating += 65; }
+            else if (percentageSimilarity >= 70) { bannedPlayer.suspectRating += 60; }
+            else if (percentageSimilarity >= 60) { bannedPlayer.suspectRating += 50; }
+            else if (percentageSimilarity >= 50) { bannedPlayer.suspectRating += 40; }
+            else if (percentageSimilarity >= 40) { bannedPlayer.suspectRating += 30; }
+            else if (percentageSimilarity >= 30) { bannedPlayer.suspectRating += 20; }
             else if (percentageSimilarity >= 20) { bannedPlayer.suspectRating += 10; }
             else if (percentageSimilarity >= 10) { bannedPlayer.suspectRating += 5; }
-        }//Compares the percentage simil
+        }//Compares the percentage similarity between suspects friends and banned players friends.
         public void evaluateUNIX(Player bannedPlayer) {
             int differenceInUnix = suspect.playerData.timeCreated - bannedPlayer.unixTimestampOfRecentBan;
             if (differenceInUnix > 0) {
@@ -67,7 +67,6 @@ namespace SteamPlayerInvestigatorV2
         }//Adds to suspect rating of banned player based on Steam Level
         public void comparePersonaName(Player bannedPlayer) {
             if(bannedPlayer.personaName == null) { return; }
-            if(bannedPlayer.personaName.Contains(suspect.playerData.personaName) || suspect.playerData.personaName.Contains(bannedPlayer.personaName)) { bannedPlayer.suspectRating += 100; return; }//If either name contains the other
 
             int numberOfChangesRequired = 0, iterate = 0;
 
@@ -81,10 +80,10 @@ namespace SteamPlayerInvestigatorV2
                 if (bannedPlayer.personaName[i] != suspect.playerData.personaName[i]) { numberOfChangesRequired++; }
             }//The more similar the names, the less number of changes required.
 
-            if(numberOfChangesRequired == 0) { bannedPlayer.suspectRating += 100; }//Both can have the same persona name
-            else if (numberOfChangesRequired == 1) { bannedPlayer.suspectRating += 75; }
-            else if (numberOfChangesRequired == 2) { bannedPlayer.suspectRating += 50; }
-            else if (numberOfChangesRequired == 3) { bannedPlayer.suspectRating += 25; }
+            if(numberOfChangesRequired == 0) { bannedPlayer.suspectRating += 75; }//Both can have the same persona name
+            else if (numberOfChangesRequired == 1) { bannedPlayer.suspectRating += 60; }
+            else if (numberOfChangesRequired == 2) { bannedPlayer.suspectRating += 45; }
+            else if (numberOfChangesRequired == 3) { bannedPlayer.suspectRating += 30; }
         }//Calculates number of char changes to make bannedPlayer persona into the suspects.
         public void compareGameList(Player bannedPlayer) {
             if (bannedPlayer.gameList.Count != 0) {
@@ -109,7 +108,7 @@ namespace SteamPlayerInvestigatorV2
         public void compareLocCodes(Player bannedPlayer) {
             if(bannedPlayer.locCountryCode == suspect.playerData.locCountryCode)
             {
-                if(bannedPlayer.locStateCode == suspect.playerData.locStateCode){ bannedPlayer.suspectRating += 25; }//If they are in the same country + state
+                if(bannedPlayer.locStateCode == suspect.playerData.locStateCode){ bannedPlayer.suspectRating += 40; }//If they are in the same country + state
                 else { bannedPlayer.suspectRating += 10; }//If they are only in the same country
             }
         }//Adds to suspect rating of banned player based on Account location, if same country - Suspicous, same state - very suspicous
