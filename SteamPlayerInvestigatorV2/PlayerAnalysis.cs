@@ -30,7 +30,7 @@ namespace SteamPlayerInvestigatorV2
         }
         public void friendsListAnalysis(Player bannedPlayer) {
             double similarity = suspect.playerData.friendsList.Intersect(bannedPlayer.friendsList).Count();
-            similarity = similarity / bannedPlayer.friendsList.Count();
+            similarity = similarity / suspect.playerData.friendsList.Count();
             double percentageSimilarity = similarity * 100;
             if (percentageSimilarity == 100) { bannedPlayer.suspectRating += 50; }
             else if (percentageSimilarity >= 90) { bannedPlayer.suspectRating += 45; }
@@ -42,7 +42,7 @@ namespace SteamPlayerInvestigatorV2
             else if (percentageSimilarity >= 30) { bannedPlayer.suspectRating += 15; }
             else if (percentageSimilarity >= 20) { bannedPlayer.suspectRating += 10; }
             else if (percentageSimilarity >= 10) { bannedPlayer.suspectRating += 5; }
-        }
+        }//Compares the percentage simil
         public void evaluateUNIX(Player bannedPlayer) {
             int differenceInUnix = suspect.playerData.timeCreated - bannedPlayer.unixTimestampOfRecentBan;
             if (differenceInUnix > 0) {
@@ -89,14 +89,14 @@ namespace SteamPlayerInvestigatorV2
         public void compareGameList(Player bannedPlayer) {
             if (bannedPlayer.gameList.Count != 0) {
                 double similarity = suspect.playerData.gameList.Intersect(bannedPlayer.gameList).Count();
-                similarity = similarity / bannedPlayer.gameList.Count() * 100;
+                similarity = similarity / suspect.playerData.gameList.Count() * 100;
                 percentageSimilaritySuspectRatings(bannedPlayer, similarity);
             }
         }
         public void compareRecentGames(Player bannedPlayer) {
             if(bannedPlayer.recentlyPlayed.Count != 0) {
                 double similarity = suspect.playerData.recentlyPlayed.Intersect(bannedPlayer.recentlyPlayed).Count();
-                similarity = similarity / bannedPlayer.recentlyPlayed.Count() * 100;
+                similarity = similarity / suspect.playerData.recentlyPlayed.Count() * 100;
                 percentageSimilaritySuspectRatings(bannedPlayer, similarity);
             }
         }
